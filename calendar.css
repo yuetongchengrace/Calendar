@@ -1,11 +1,17 @@
-
 #calendar_table {
-    
-    width: 80%;
+    text-align: center;
+    width: 100%;
+}
+
+table, th, td {  
     border: 1px solid black;
     border-collapse: collapse;
     background-color: seashell;
-    text-align: center;
+}
+
+td{
+    width: 14.2%;
+    padding: 15px;
 }
 
 
