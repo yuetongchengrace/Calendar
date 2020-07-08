@@ -54,27 +54,43 @@
 		
 		// Change the month when the "next" button is pressed
 		document.getElementById("next_month_btn").addEventListener("click", function(event){
-			currentMonth = currentMonth.nextMonth(); // Previous month would be currentMonth.prevMonth()
+			currentMonth = currentMonth.nextMonth();
+			let htmlTableObj = document.getElementById("calendar_table");
+			htmlTableObj.innerHTML = "";
+			let htmlCaptionObj = htmlTableObj.appendChild(document.createElement("caption"));
+			htmlCaptionObj.appendChild(document.createTextNode("Current Month: "))
 			updateCalendar(); // Whenever the month is updated, we'll need to re-render the calendar in HTML
-			alert("The new month is "+currentMonth.month+" "+currentMonth.year);
+			//alert("The new month is "+currentMonth.month+" "+currentMonth.year);
+			htmlCaptionObj.textContent = currentMonth.year+'.'+currentMonth.month;
 		}, false);
 		
 		
-		// This updateCalendar() function only alerts the dates in the currently specified month.  You need to write
-		// it to modify the DOM (optionally using jQuery) to display the days and weeks in the current month.
 		function updateCalendar(){
-			let weeks = currentMonth.getWeeks();
+			// let htmlTableObj = document.getElementById("calendar_table");
+			// htmlTableObj.innerHTML = "";
+			// let htmlCaptionObj = htmlTableObj.appendChild(document.createElement("caption"));
+			// htmlCaptionObj.appendChild(document.createTextNode("Current Month: "))
 			
+			let htmlWeekObj = htmlTableObj.appendChild(document.createElement("tr"));
+			for(let i=0; i<7; i++){
+				let htmlDayObj = htmlWeekObj.appendChild(document.createElement("th"));
+				let weekDays = ['Sunday', 'Monday','Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+				htmlDayObj.appendChild(document.createTextNode(weekDays[i]));
+			}
+
+			let weeks = currentMonth.getWeeks();
+			let dayRegex = /\d{2}/g;
+
 			for(let w in weeks){
+				let htmlWeekObj = htmlTableObj.appendChild(document.createElement("tr"));
 				let days = weeks[w].getDates();
-				// days contains normal JavaScript Date objects.
-				
-				alert("Week starting on "+days[0]);
-				
+
 				for(let d in days){
-					// You can see console.log() output in your JavaScript debugging tool, like Firebug,
-					// WebWit Inspector, or Dragonfly.
-					console.log(days[d].toISOString());
+					let htmlDayObj = htmlWeekObj.appendChild(document.createElement("td"));
+					let day = days[d].toISOString();
+					let match = day.match(dayRegex)[3];
+					htmlDayObj.appendChild(document.createTextNode(match));
+
 				}
 			}
 		}
