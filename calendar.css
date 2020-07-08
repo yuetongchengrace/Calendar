@@ -1,0 +1,11 @@
+
+#calendar_table {
+    
+    width: 80%;
+    border: 1px solid black;
+    border-collapse: collapse;
+    background-color: seashell;
+    text-align: center;
+}
+
+
