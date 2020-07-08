@@ -3,12 +3,13 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" type="text/css" href="calendar.css" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<title>Calendar</title>
 </head>
 <body>
 
 	<button type="button" id="next_month_btn">Next Month</button>
-	<br>
+	<a href="logout.php">logout</a>
 	<table id="calendar_table">
 		<caption id="current_month">Current Month:</caption>
 		<tr>
@@ -47,7 +48,14 @@
 				let day = days[j].toISOString();
 				//console.log(day.match(dayRegex)[3]);
 				let match = day.match(dayRegex)[3];
-				htmlDayObj.appendChild(document.createTextNode(match));
+				let each= document.createElement("div");
+				each.classList.add("td_div");
+				$(".td_div").click(function(){
+                	$("#myform input[type=text]").val('');
+                	$("#myform").show(500);
+				});
+                each.textContent=match;
+                htmlDayObj.appendChild(each);
 			}
 
 		}
@@ -89,11 +97,31 @@
 					let htmlDayObj = htmlWeekObj.appendChild(document.createElement("td"));
 					let day = days[d].toISOString();
 					let match = day.match(dayRegex)[3];
-					htmlDayObj.appendChild(document.createTextNode(match));
+					let each= document.createElement("div");
+					each.classList.add("td_div");
+					$(".td_div").click(function(){
+						$("#myform input[type=text]").val('');
+						$("#myform").show(500);
+					});
+                	each.textContent=match;
+                	htmlDayObj.appendChild(each);
 
 				}
 			}
 		}
 	</script>
+    <div class="dialog" id="myform">
+        <form>
+            <div>Event:</div>
+            <textarea id="event_content"></textarea>
+            <div>
+                <span>Time:</span>
+                <input type="text"/>
+            </div>
+            
+            <button id="add">add</button>
+            <button id="cancel_add">X</button>
+        </form>
+    </div>
 </body>
 </html>
