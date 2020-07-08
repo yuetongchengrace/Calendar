@@ -1,0 +1,83 @@
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href="calendar.css" />
+	<title>Calendar</title>
+</head>
+<body>
+
+	<button type="button" id="next_month_btn">Next Month</button>
+	<br>
+	<table id="calendar_table">
+		<caption id="current_month">Current Month:</caption>
+		<tr>
+		  <th>Sunday</th>
+		  <th>Monday</th>
+		  <th>Tuesday</th>
+		  <th>Wednesday</th>
+		  <th>Thursday</th>
+		  <th>Friday</th>
+		  <th>Saturday</th>
+		</tr>
+		
+	  </table>
+
+
+	<script>
+		(function(){Date.prototype.deltaDays=function(c){return new Date(this.getFullYear(),this.getMonth(),this.getDate()+c)};Date.prototype.getSunday=function(){return this.deltaDays(-1*this.getDay())}})();
+		function Week(c){this.sunday=c.getSunday();this.nextWeek=function(){return new Week(this.sunday.deltaDays(7))};this.prevWeek=function(){return new Week(this.sunday.deltaDays(-7))};this.contains=function(b){return this.sunday.valueOf()===b.getSunday().valueOf()};this.getDates=function(){for(var b=[],a=0;7>a;a++)b.push(this.sunday.deltaDays(a));return b}}
+		function Month(c,b){this.year=c;this.month=b;this.nextMonth=function(){return new Month(c+Math.floor((b+1)/12),(b+1)%12)};this.prevMonth=function(){return new Month(c+Math.floor((b-1)/12),(b+11)%12)};this.getDateObject=function(a){return new Date(this.year,this.month,a)};this.getWeeks=function(){var a=this.getDateObject(1),b=this.nextMonth().getDateObject(0),c=[],a=new Week(a);for(c.push(a);!a.contains(b);)a=a.nextWeek(),c.push(a);return c}};
+
+		// For our purposes, we can keep the current month in a variable in the global scope
+		let currentMonth = new Month(2020, 7); // October 2017
+		
+		let htmlMonthObj = document.getElementById("current_month");
+		htmlMonthObj.textContent = currentMonth.year+'.'+currentMonth.month;
+		let weeks = currentMonth.getWeeks();
+		let dayRegex = /\d{2}/g;
+		//console.log(weeks[0].getDates()[0].toISOString());
+		let htmlTableObj = document.getElementById("calendar_table");
+		for(let i=0; i<weeks.length; i++){
+			let htmlWeekObj = htmlTableObj.appendChild(document.createElement("tr"));
+			let currentWeek = weeks[i];
+			for(let j=0; j<7; j++){
+				let days = currentWeek.getDates();
+				let htmlDayObj = htmlWeekObj.appendChild(document.createElement("td"));
+				let day = days[j].toISOString();
+				//console.log(day.match(dayRegex)[3]);
+				let match = day.match(dayRegex)[3];
+				htmlDayObj.appendChild(document.createTextNode(match));
+			}
+
+		}
+		
+		// Change the month when the "next" button is pressed
+		document.getElementById("next_month_btn").addEventListener("click", function(event){
+			currentMonth = currentMonth.nextMonth(); // Previous month would be currentMonth.prevMonth()
+			updateCalendar(); // Whenever the month is updated, we'll need to re-render the calendar in HTML
+			alert("The new month is "+currentMonth.month+" "+currentMonth.year);
+		}, false);
+		
+		
+		// This updateCalendar() function only alerts the dates in the currently specified month.  You need to write
+		// it to modify the DOM (optionally using jQuery) to display the days and weeks in the current month.
+		function updateCalendar(){
+			let weeks = currentMonth.getWeeks();
+			
+			for(let w in weeks){
+				let days = weeks[w].getDates();
+				// days contains normal JavaScript Date objects.
+				
+				alert("Week starting on "+days[0]);
+				
+				for(let d in days){
+					// You can see console.log() output in your JavaScript debugging tool, like Firebug,
+					// WebWit Inspector, or Dragonfly.
+					console.log(days[d].toISOString());
+				}
+			}
+		}
+	</script>
+</body>
+</html>
