@@ -25,10 +25,16 @@ td{
     border-radius: 5%;
     position:fixed;
     top:200px;
-    left:40%;
+    left:30%;
     display:none;
+    width:300px;
+    text-align:center;
 }
 
 .not_this_month{
     background-color:rgb(159, 158, 158);
+}
+
+textarea{
+    resize: none;
 }
