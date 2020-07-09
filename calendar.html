@@ -10,8 +10,9 @@
 	<button type="button" id="previous_month_btn">Last Month</button>
 	<button type="button" id="next_month_btn">Next Month</button>
 	<a href="logout.php">logout</a>
+	<br>
 	<table id="calendar_table">
-		<caption id="current_month">Current Month:</caption>
+		<caption id="current_month">Current Month: </caption>
 		<tr>
 		  <th>Sunday</th>
 		  <th>Monday</th>
@@ -31,10 +32,10 @@
 		function Month(c,b){this.year=c;this.month=b;this.nextMonth=function(){return new Month(c+Math.floor((b+1)/12),(b+1)%12)};this.prevMonth=function(){return new Month(c+Math.floor((b-1)/12),(b+11)%12)};this.getDateObject=function(a){return new Date(this.year,this.month,a)};this.getWeeks=function(){var a=this.getDateObject(1),b=this.nextMonth().getDateObject(0),c=[],a=new Week(a);for(c.push(a);!a.contains(b);)a=a.nextWeek(),c.push(a);return c}};
 
 		// For our purposes, we can keep the current month in a variable in the global scope
-		let currentMonth = new Month(2020, 06); // July
+		let currentMonth = new Month(2020, 06); 
 		
 		let htmlMonthObj = document.getElementById("current_month");
-		htmlMonthObj.textContent = currentMonth.year+'.'+parseInt(currentMonth.month+1);
+		htmlMonthObj.textContent += currentMonth.year+'.'+parseInt(currentMonth.month+1);
 		let weeks = currentMonth.getWeeks();
 		let dayRegex = /\d{2}/g;
 		//console.log(weeks[0].getDates()[0].toISOString());
@@ -46,11 +47,13 @@
 				let days = currentWeek.getDates();
 				let htmlDayObj = htmlWeekObj.appendChild(document.createElement("td"));
 				let day = days[j].toISOString();
+				//set id value
 				htmlDayObj.setAttribute("id",day);
-				//console.log(day.match(dayRegex)[3]);
 				let match_month=day.match(dayRegex)[2];
 				let match = day.match(dayRegex)[3];
 				let each= document.createElement("div");
+				//each.setAttribute("id", day);
+				each.id = day;
 				each.classList.add("td_div");
 				each.id=day;
 				console.log(day);
@@ -59,16 +62,18 @@
 				if(match_month!=currentMonth.month+1){
 					each.classList.add("not_this_month");
 				}
-				console.log("#"+day);
-				$('#',day).click(function(){
+				//console.log(each);
+				$(".td_div").click(function(){
+					id=$(this).attr("id");
                 	$("#myform input[type=text]").val('');
 					$("#myform").show(500);
-					$('#dateId').val(day);
-					console.log(day);
+					$('#dateId').val(id);
+					console.log(id);
 				});
-                each.textContent=match;
+				each.textContent=match;
 				htmlDayObj.appendChild(each);
 				DisplayEventAjax(day,each);
+				//htmlDayObj.appendChild(document.createTextNode(match));
 			}
 
 		}
@@ -98,10 +103,10 @@
 		
 		
 		function updateCalendar(){
-			//let htmlTableObj = document.getElementById("calendar_table");
-			//htmlTableObj.innerHTML = "";
-			//let htmlCaptionObj = htmlTableObj.appendChild(document.createElement("caption"));
-			//htmlCaptionObj.appendChild(document.createTextNode("Current Month: "));
+			// let htmlTableObj = document.getElementById("calendar_table");
+			// htmlTableObj.innerHTML = "";
+			// let htmlCaptionObj = htmlTableObj.appendChild(document.createElement("caption"));
+			// htmlCaptionObj.appendChild(document.createTextNode("Current Month: "))
 			
 			let htmlWeekObj = htmlTableObj.appendChild(document.createElement("tr"));
 			for(let i=0; i<7; i++){
@@ -120,7 +125,7 @@
 				for(let d in days){
 					let htmlDayObj = htmlWeekObj.appendChild(document.createElement("td"));
 					let day = days[d].toISOString();
-					htmlDayObj.setAttribute("id",day)
+					//htmlDayObj.setAttribute("id", day)
 					let match_month=day.match(dayRegex)[2];
 					let match = day.match(dayRegex)[3];
 					let each= document.createElement("div");
@@ -132,6 +137,7 @@
 						each.classList.add("not_this_month");
 					}
 					$(".td_div").click(function(){
+						id=$(this).attr("id");
 						$("#myform input[type=text]").val('');
 						$("#myform").show(500);
 						$('#dateId').val(id);
@@ -139,10 +145,11 @@
                 	each.textContent=match;
 					htmlDayObj.appendChild(each);
 					DisplayEventAjax(day,each);
+					//htmlDayObj.appendChild(document.createTextNode(match));
 				}
 			}
-			
 		}
+
 		function DisplayEventAjax(day,each) {
 			
 			const data = {'day': day};
@@ -170,22 +177,24 @@
 			.catch(err => console.error(err));
 			
 		}
+
 	</script>
-    <div class="dialog" id="myform">
-        <form>
-            <div>Event:</div>
-            <textarea id="event_content"></textarea>
-            <div>
-                <span>Time:</span>
+	<div class="dialog" id="myform">
+		<form>
+			<div>Event:</div>
+			<textarea id="event_content"></textarea>
+			<div>
+				<span>Time:</span>
 				<input type="text"/>
-				<input type="hidden" id="dateId" value=""/>
-            </div>
-            
-            <button id="add">add</button>
-            <button id="cancel_add">X</button>
-        </form>
+			</div>
+			<input type="hidden" id="dateId" value="">
+			<button id="add">add</button>
+			<button id="cancel_add">X</button>
+		</form>
 	</div>
+
 	<script>
+
 		document.getElementById("cancel_add").addEventListener("click",function(event){
 			event.preventDefault();
 			$("#myform").hide(400);
@@ -200,7 +209,7 @@
 			//console.log(date);
 			date.appendChild(document.createTextNode(content));
 
-			}, false);
+		}, false);
 	</script>
 </body>
 </html>
