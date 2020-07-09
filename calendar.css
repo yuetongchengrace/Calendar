@@ -29,5 +29,6 @@ td{
     display:none;
 }
 
-
-
+.not_this_month{
+    background-color:rgb(159, 158, 158);
+}

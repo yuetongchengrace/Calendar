@@ -27,7 +27,7 @@ $stmt->close();
 //verify password
 if(password_verify($password, $hashed_password)){
 	session_start();
-	$_SESSION['username'] = $username;
+    $_SESSION['username'] = $username;
 	$_SESSION['token'] = bin2hex(openssl_random_pseudo_bytes(32)); 
 
 	echo json_encode(array(
