@@ -47,35 +47,41 @@
 				let days = currentWeek.getDates();
 				let htmlDayObj = htmlWeekObj.appendChild(document.createElement("td"));
 				let day = days[j].toISOString();
+				
 				//set id value
 				//htmlDayObj.setAttribute("id",day);
 				let match_month=day.match(dayRegex)[2];
 				let match = day.match(dayRegex)[3];
 				let each= document.createElement("div");
-				//each.setAttribute("id", day);
-				each.id = day;
+				each.setAttribute("id", day);
 				each.classList.add("td_div");
-				each.id=day;
+				//each.id=day;
 				//console.log(day);
 				//console.log(match_month);
 				//console.log(currentMonth.month);
 				if(match_month!=currentMonth.month+1){
 					each.classList.add("not_this_month");
 				}
-				//console.log(each);
-				$(".td_div").click(function(){
+				let div_arr=document.getElementsByClassName("td_div");
+				$(each).click(function(){
 					id=$(this).attr("id");
-                	$("#myform input[type=text]").val('');
 					$("#myform").show(500);
 					$('#dateId').val(id);
-					//console.log(id);
+					displayEventByDay(id);
 				});
+				// $(".td_div").click(function(){
+				// 	id=$(this).attr("id");
+                // 	$("#myform input[type=text]").val('');
+				// 	$("#myform").show(500);
+				// 	$('#dateId').val(id);
+				// 	//console.log(id);
+				// 	displayEventByDay(id);
+				// });
 				each.textContent=match;
 				htmlDayObj.appendChild(each);
 				DisplayEventAjax(day,each);
 				//htmlDayObj.appendChild(document.createTextNode(match));
 			}
-
 		}
 		// Change the month when the "last" button is pressed
 		document.getElementById("previous_month_btn").addEventListener("click", function(event){
@@ -165,7 +171,7 @@
 				})
 			.then(response => response.json())
 			.then(data => {
-				//console.log(data.success ? "Succesfully added event" : `Add event failed ${data.message}`);
+				console.log(data.success ? "Succesfully display event" : `Display event failed ${data.message}`);
 				if(data.success==true){
 					for(i=0;i<data.event.length;i++){
 						let each_event=document.createElement("div");
@@ -180,12 +186,13 @@
 
 	</script>
 	<div class="dialog" id="myform">
+		<div id="dialog_events"></div>
 		<form>
 			<div>Event:</div>
 			<textarea id="event_content"></textarea>
 			<div>
 				<span>Time:</span>
-				<input type="text"/>
+				<input type="text" id="time"/>
 			</div>
 			<input type="hidden" id="dateId" value="">
 			<button id="add">add</button>
@@ -210,8 +217,61 @@
 			let each = document.createElement("div");
 			each.innerHTML = content;
 			date.appendChild(each);
+			console.log(id);
+			const idRegex = /\d{4}-\d{2}-\d{2}\w\d{2}:/g;
+			let sqlDate = id.match(idRegex);
+			let time = document.getElementById("time").value;
+			let dt = String(sqlDate+time+".000Z");
+			//console.log(dt);
+			const data = {'content': content, 'datetime': dt};
+			fetch('addEvent.php', {
+				method: "POST",
+				body: JSON.stringify(data)
+			})
+			.then(response => response.json())
+			.then(console.log(data))
+			.catch(error => console.error(error));
 
 		}, false);
+		function displayEventByDay(id){
+			document.getElementById("dialog_events").innerHTML="";
+			const data = {'day': id};
+			// Make a URL-encoded string for passing POST data:
+			//const data = { 'username': username, 'password': password };
+			const token= document.getElementsByName("token").value;
+			fetch("showevent.php", {
+					method: 'POST',
+					body: JSON.stringify(data),
+					headers: { 'content-type': 'application/json' 
+					//,'X-CSRF-Token': token 
+					}
+				})
+			.then(response => response.json())
+			.then(data => {
+				console.log(data.success ? "Succesfully display event" : `Display event failed ${data.message}`);
+				if(data.success==true){
+					for(i=0;i<data.event.length;i++){
+						console.log(data.event);
+						let each_event=document.createElement("div");
+						let event_content=document.createElement("span");
+						event_content.innerHTML=data.event[i];
+						each_event.appendChild(event_content);
+						let modify_button=document.createElement("button");
+						modify_button.innerHTML="modify";
+						modify_button.addEventListener("click",function(){
+							console.log("modify");
+						});
+						each_event.appendChild(modify_button);
+						let delete_button=document.createElement("button");
+						delete_button.innerHTML="delete";
+						each_event.appendChild(delete_button);
+						document.getElementById("dialog_events").appendChild(each_event);
+					}
+				}
+			})
+			.catch(err => console.error(err));
+			return;
+		}
 	</script>
 </body>
 </html>
