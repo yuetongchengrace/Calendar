@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
@@ -9,8 +10,19 @@
 <body>
 	<button type="button" id="previous_month_btn">Last Month</button>
 	<button type="button" id="next_month_btn">Next Month</button>
-	<a href="logout.php">logout</a>
+	<a href="logout.php" id="login_or_out" ></a>
 	<br>
+	<script>
+		let htmlButtonObj = document.getElementById("login_or_out");
+		fetch("checkUser.php")
+			.then(response => response.json())
+			.then(function(response) {
+				console.log(JSON.stringify(response.message));
+				document.getElementById("login_or_out").textContent = response.message;
+			})
+			.catch(err => console.error(err));
+			
+	</script>
 	<table id="calendar_table">
 		<caption id="current_month">Current Month: </caption>
 		<tr>
@@ -70,6 +82,7 @@
 					$("#myform").show(500);
 					$('#dateId').val(id);
 					displayEventByDay(id);
+					$("#time").val("");
 				});
 				each.textContent=match;
 				htmlDayObj.appendChild(each);
@@ -157,7 +170,12 @@
 				if(data.success==true){
 					for(i=0;i<data.event.length;i++){
 						let each_event=document.createElement("div");
-						each_event.innerHTML=data.event[i]
+						let each_event_title=document.createElement("span");
+						each_event_title.innerHTML=data.event[i]+" ";
+						let each_event_time=document.createElement("span");
+						each_event_time.innerHTML=data.datetime[i].substring(11, 16);
+						each_event.appendChild(each_event_title);
+						each_event.appendChild(each_event_time);
 						each.appendChild(each_event);
 						
 					}
@@ -170,6 +188,7 @@
 	</script>
 	<!--Pop up window html-->
 	<div class="dialog" id="myform">
+		<div id="today"></div>
 		<div id="dialog_events"></div>
 		<form>
 			<div>Event:</div>
@@ -177,6 +196,7 @@
 			<div>
 				<span>Time:</span>
 				<input type="text" id="time"/>
+				<div>Please write in the format: HH:MM</div>
 			</div>
 			<input type="hidden" id="dateId" value="">
 			<button id="add">add</button>
@@ -200,13 +220,18 @@
 				let date = document.getElementById(id);
 				console.log(date);
 				let each = document.createElement("div");
-				each.innerHTML = content;
+				let each_event_title=document.createElement("span");
+				each_event_title.innerHTML=content;
+				let each_event_time=document.createElement("span");
+				each_event_time.innerHTML=document.getElementById("time").value;
+				each.appendChild(each_event_title);
+				each.appendChild(each_event_time);
 				date.appendChild(each);
 				console.log(id);
-				const idRegex = /\d{4}-\d{2}-\d{2}\w\d{2}:/g;
+				const idRegex = /\d{4}-\d{2}-\d{2}\w/g;
 				let sqlDate = id.match(idRegex);
 				let time = document.getElementById("time").value;
-				let dt = String(sqlDate+time+".000Z");
+				let dt = String(sqlDate+time+":00.000Z");
 				//console.log(dt);
 				const data = {'content': content, 'datetime': dt};
 				fetch('addEvent.php', {
@@ -222,7 +247,10 @@
 
 		//display event in pop up window according to the date
 		function displayEventByDay(id){
+			document.getElementById("today").innerHTML="";
 			document.getElementById("dialog_events").innerHTML="";
+			const today_date=id.substring(0,10);
+   			document.getElementById("today").appendChild(document.createTextNode(today_date));
 			const data = {'day': id};
 			const token= document.getElementsByName("token").value;
 			//get response of two arrays, data.event consisting all event contents and data.event_id consisting all event ids
@@ -255,7 +283,9 @@
 						id2="delete"+data.event_id[i];
 						//console.log(id);
 						each_event.appendChild(event_content);
-						//modify button is not done
+						let event_time=document.createElement("span");
+						event_time.innerHTML=data.datetime[i].substring(11,16);
+						each_event.appendChild(event_time);
 						let modify_button=document.createElement("button");
 						modify_button.setAttribute("id",id);
 						modify_button.innerHTML="modify";
@@ -295,26 +325,27 @@
 							modify_form.appendChild(modify_confirm);
 
 							$(modify_confirm).click(function(){
+								if(document.getElementById(modify_text_id).value!=""){
 								
-								const modified_content = document.getElementById(modify_text_id).value;//get text from modify_text
-								//console.log(modified_content);
-								console.log(modify_id);
-								const data = {'modify_id': modify_id, 'changed_content': modified_content};
-								const token= document.getElementsByName("token").value;
-								fetch("modify.php", {
-										method: 'POST',
-										body: JSON.stringify(data),
-										headers: { 'content-type': 'application/json' 
-										//,'X-CSRF-Token': token 
-										}
+									const modified_content = document.getElementById(modify_text_id).value;//get text from modify_text
+									//console.log(modified_content);
+									console.log(modify_id);
+									const data = {'modify_id': modify_id, 'changed_content': modified_content};
+									const token= document.getElementsByName("token").value;
+									fetch("modify.php", {
+											method: 'POST',
+											body: JSON.stringify(data),
+											headers: { 'content-type': 'application/json' 
+											//,'X-CSRF-Token': token 
+											}
+										})
+									.then(response => response.json())
+									.then(data => {
+										console.log(data.success ? "Succesfully modify event" : `Modify event failed ${data.message}`);
+										updateCalendar();
 									})
-								.then(response => response.json())
-								.then(data => {
-									console.log(data.success ? "Succesfully modify event" : `Modify event failed ${data.message}`);
-									updateCalendar();
-								})
-								.catch(err => console.error(err));
-
+									.catch(err => console.error(err));
+								}
 							})
 
 
