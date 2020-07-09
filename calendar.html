@@ -31,8 +31,8 @@
 		function Week(c){this.sunday=c.getSunday();this.nextWeek=function(){return new Week(this.sunday.deltaDays(7))};this.prevWeek=function(){return new Week(this.sunday.deltaDays(-7))};this.contains=function(b){return this.sunday.valueOf()===b.getSunday().valueOf()};this.getDates=function(){for(var b=[],a=0;7>a;a++)b.push(this.sunday.deltaDays(a));return b}}
 		function Month(c,b){this.year=c;this.month=b;this.nextMonth=function(){return new Month(c+Math.floor((b+1)/12),(b+1)%12)};this.prevMonth=function(){return new Month(c+Math.floor((b-1)/12),(b+11)%12)};this.getDateObject=function(a){return new Date(this.year,this.month,a)};this.getWeeks=function(){var a=this.getDateObject(1),b=this.nextMonth().getDateObject(0),c=[],a=new Week(a);for(c.push(a);!a.contains(b);)a=a.nextWeek(),c.push(a);return c}};
 
-		// For our purposes, we can keep the current month in a variable in the global scope
-		let currentMonth = new Month(2020, 06); 
+		
+		let currentMonth = new Month(2020, 06); //July 2020
 		
 		let htmlMonthObj = document.getElementById("current_month");
 		htmlMonthObj.textContent += currentMonth.year+'.'+parseInt(currentMonth.month+1);
@@ -63,58 +63,41 @@
 					each.classList.add("not_this_month");
 				}
 				let div_arr=document.getElementsByClassName("td_div");
+				//jquery for displaying pop up and event inside
 				$(each).click(function(){
 					id=$(this).attr("id");
 					$("#myform").show(500);
 					$('#dateId').val(id);
 					displayEventByDay(id);
 				});
-				// $(".td_div").click(function(){
-				// 	id=$(this).attr("id");
-                // 	$("#myform input[type=text]").val('');
-				// 	$("#myform").show(500);
-				// 	$('#dateId').val(id);
-				// 	//console.log(id);
-				// 	displayEventByDay(id);
-				// });
 				each.textContent=match;
 				htmlDayObj.appendChild(each);
+				//call to function that displays event of that day
 				DisplayEventAjax(day,each);
-				//htmlDayObj.appendChild(document.createTextNode(match));
 			}
 		}
 		// Change the month when the "last" button is pressed
 		document.getElementById("previous_month_btn").addEventListener("click", function(event){
 			currentMonth = currentMonth.prevMonth();
-			let htmlTableObj = document.getElementById("calendar_table");
-			htmlTableObj.innerHTML = "";
-			let htmlCaptionObj = htmlTableObj.appendChild(document.createElement("caption"));
-			htmlCaptionObj.appendChild(document.createTextNode("Current Month: "));
 			updateCalendar(); // Whenever the month is updated, we'll need to re-render the calendar in HTML
 			//alert("The new month is "+currentMonth.month+" "+currentMonth.year);
-			htmlCaptionObj.textContent += currentMonth.year+'.'+parseInt(currentMonth.month+1);
 		}, false);
 
 		// Change the month when the "next" button is pressed
 		document.getElementById("next_month_btn").addEventListener("click", function(event){
 			currentMonth = currentMonth.nextMonth();
+			updateCalendar(); // Whenever the month is updated, we'll need to re-render the calendar in HTML
+			//alert("The new month is "+currentMonth.month+" "+currentMonth.year);
+		}, false);
+		
+		//update calendar (used when user clicked to another month)
+		function updateCalendar(){
 			let htmlTableObj = document.getElementById("calendar_table");
 			htmlTableObj.innerHTML = "";
 			let htmlCaptionObj = htmlTableObj.appendChild(document.createElement("caption"));
-			htmlCaptionObj.appendChild(document.createTextNode("Current Month: "));
-			updateCalendar(); // Whenever the month is updated, we'll need to re-render the calendar in HTML
-			//alert("The new month is "+currentMonth.month+" "+currentMonth.year);
-			htmlCaptionObj.textContent += currentMonth.year+'.'+parseInt(currentMonth.month+1);
-		}, false);
-		
-		
-		function updateCalendar(){
-			// let htmlTableObj = document.getElementById("calendar_table");
-			// htmlTableObj.innerHTML = "";
-			// let htmlCaptionObj = htmlTableObj.appendChild(document.createElement("caption"));
-			// htmlCaptionObj.appendChild(document.createTextNode("Current Month: "))
-			
 			let htmlWeekObj = htmlTableObj.appendChild(document.createElement("tr"));
+			htmlCaptionObj.appendChild(document.createTextNode("Current Month: "));
+			htmlCaptionObj.textContent += currentMonth.year+'.'+parseInt(currentMonth.month+1);
 			for(let i=0; i<7; i++){
 				let htmlDayObj = htmlWeekObj.appendChild(document.createElement("th"));
 				let weekDays = ['Sunday', 'Monday','Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -131,31 +114,29 @@
 				for(let d in days){
 					let htmlDayObj = htmlWeekObj.appendChild(document.createElement("td"));
 					let day = days[d].toISOString();
-					//htmlDayObj.setAttribute("id", day)
 					let match_month=day.match(dayRegex)[2];
 					let match = day.match(dayRegex)[3];
 					let each= document.createElement("div");
 					each.classList.add("td_div");
 					each.id=day;
-					//console.log(match_month);
-					//console.log(currentMonth.month);
 					if(match_month!=currentMonth.month+1){
 						each.classList.add("not_this_month");
 					}
-					$(".td_div").click(function(){
+					$(each).click(function(){
 						id=$(this).attr("id");
 						$("#myform input[type=text]").val('');
 						$("#myform").show(500);
 						$('#dateId').val(id);
+						displayEventByDay(id);
 					});
                 	each.textContent=match;
 					htmlDayObj.appendChild(each);
+					//call to function that displays event of that day
 					DisplayEventAjax(day,each);
-					//htmlDayObj.appendChild(document.createTextNode(match));
 				}
 			}
 		}
-
+		//display all events of that day in the corresponding div
 		function DisplayEventAjax(day,each) {
 			
 			const data = {'day': day};
@@ -177,6 +158,7 @@
 						let each_event=document.createElement("div");
 						each_event.innerHTML=data.event[i]
 						each.appendChild(each_event);
+						
 					}
 				}
 			})
@@ -185,6 +167,7 @@
 		}
 
 	</script>
+	<!--Pop up window html-->
 	<div class="dialog" id="myform">
 		<div id="dialog_events"></div>
 		<form>
@@ -201,15 +184,15 @@
 	</div>
 
 	<script>
-
+		//click cancel can close pop up window
 		document.getElementById("cancel_add").addEventListener("click",function(event){
 			event.preventDefault();
 			$("#myform").hide(400);
 		});
+		//click add with add new event to the html table's corresponding div, then call addEvent.php and add event to the sql events table
 		document.getElementById("add").addEventListener("click",function(event){
 			event.preventDefault();
 			$("#myform").hide(400);
-			event.preventDefault();
 			const content = document.getElementById("event_content").value;
 			const id = document.getElementById("dateId").value;
 			let date = document.getElementById(id);
@@ -233,12 +216,14 @@
 			.catch(error => console.error(error));
 
 		}, false);
+
+		//display event in pop up window according to the date
 		function displayEventByDay(id){
 			document.getElementById("dialog_events").innerHTML="";
 			const data = {'day': id};
-			// Make a URL-encoded string for passing POST data:
-			//const data = { 'username': username, 'password': password };
 			const token= document.getElementsByName("token").value;
+			//get response of two arrays, data.event consisting all event contents and data.event_id consisting all event ids
+			//the same event will have the same index in both arrays;
 			fetch("showevent.php", {
 					method: 'POST',
 					body: JSON.stringify(data),
@@ -250,28 +235,106 @@
 			.then(data => {
 				console.log(data.success ? "Succesfully display event" : `Display event failed ${data.message}`);
 				if(data.success==true){
+					//loop through and print event contents, each with a modify and a delete button
 					for(i=0;i<data.event.length;i++){
 						console.log(data.event);
+						console.log(data.event_id[i]);
 						let each_event=document.createElement("div");
 						let event_content=document.createElement("span");
 						event_content.innerHTML=data.event[i];
+						let content_html=data.event[i];
+						console.log(data.event[i]);
+						//this part is important, data.event_id[i] will be saved in a seperate variable.
+						//I added "modify" or "delete" in the beginning to distinguish different ids.
+						//id is for modify buttons and id2 is for delete buttons.
+						//later used to set button ids, so we can use them later in fetch("delete.php").
+						id="modify"+data.event_id[i];
+						id2="delete"+data.event_id[i];
+						console.log(id);
 						each_event.appendChild(event_content);
+						//modify button is not done
 						let modify_button=document.createElement("button");
+						modify_button.setAttribute("id",id);
 						modify_button.innerHTML="modify";
 						modify_button.addEventListener("click",function(){
-							console.log("modify");
+							console.log(this.id);
+							let regex=/\d+/;
+							function get_id(str){
+								if(match=regex.exec(str)){
+									return match[0];
+								}
+							}
+							let modify_id=get_id(this.id);
+							console.log(modify_id);
+							const data = {'modify_id': modify_id};
+							const token= document.getElementsByName("token").value;
+							fetch("modify.php", {
+									method: 'POST',
+									body: JSON.stringify(data),
+									headers: { 'content-type': 'application/json' 
+									//,'X-CSRF-Token': token 
+									}
+								})
+							.then(response => response.json())
+							.then(data => {
+								console.log(data.success ? "Succesfully modify event" : `Modify event failed ${data.message}`);
+							})
+							.catch(err => console.error(err));
+
 						});
 						each_event.appendChild(modify_button);
+
+						//click delete button will fetch delete.php which deletes event from the events table using event_id we passed in.
+						//Set id of this specific delete_button to be id2(aka "delete"+data.event_id[i] from earlier)
+						//We need to use regular expression and match out the integer part (discard the "delete" part).
+						//fetch "delete".php wil delete event with this specific id (auto_increment) so it is unique.
 						let delete_button=document.createElement("button");
+						delete_button.setAttribute("id",id2);
 						delete_button.innerHTML="delete";
+						//
+						delete_button.addEventListener("click",function(){
+							console.log(this.id);
+							let regex=/\d+/;
+							function get_id(str){
+								if(match=regex.exec(str)){
+									return match[0];
+								}
+							}
+							let delete_id=get_id(this.id);
+							console.log(delete_id);
+							const data = {'delete_id': delete_id};
+							const token= document.getElementsByName("token").value;
+							fetch("delete.php", {
+									method: 'POST',
+									body: JSON.stringify(data),
+									headers: { 'content-type': 'application/json' 
+									//,'X-CSRF-Token': token 
+									}
+								})
+							.then(response => response.json())
+							.then(data => {
+								console.log(data.success ? "Succesfully delete event" : `Delete event failed ${data.message}`);
+								if(data.success==true){
+									//remove the parent div node of this delete_button from the pop up window
+									let parent=delete_button.parentNode;
+									document.getElementById("dialog_events").removeChild(parent);
+									//updateCalendar so we won't see the removed event on the html table.
+									//might not be the most efficient.Does not refresh the page but will
+									//call updateCalendar again and display all events again without the deleted event
+									updateCalendar();
+								}
+							})
+							.catch(err => console.error(err));
+
+						});
 						each_event.appendChild(delete_button);
 						document.getElementById("dialog_events").appendChild(each_event);
 					}
 				}
 			})
 			.catch(err => console.error(err));
-			return;
 		}
+		
 	</script>
 </body>
 </html>

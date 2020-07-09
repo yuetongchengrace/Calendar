@@ -15,7 +15,7 @@ function get_regex($str){
 }
 $day_left=substr($day, 0, 10);
 require 'database.php';
-$stmt = $mysqli->prepare("select content from events where LEFT(datetime, 10)='$day_left' AND username='$username'");
+$stmt = $mysqli->prepare("select content,event_id from events where LEFT(datetime, 10)='$day_left' AND username='$username'");
 if(!$stmt){
     echo json_encode(array(
 	    "success" => false,
@@ -24,14 +24,17 @@ if(!$stmt){
     exit;
 }
     $stmt->execute();
-    $stmt->bind_result($event);
+    $stmt->bind_result($event,$event_id);
     $array=array();
+    $array2=array();
     while($stmt->fetch()){
         array_push($array,$event);
+        array_push($array2,$event_id);
     }
     if(count($array)>=1){
         echo json_encode(array(
             "event" => $array,
+            "event_id" => $array2,
             "success" => true,
             "message" => "succesfully get event from sql database"
         ));	
