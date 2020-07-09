@@ -272,7 +272,7 @@
 						//console.log(data.event_id[i]);
 						let each_event=document.createElement("div");
 						let event_content=document.createElement("span");
-						event_content.innerHTML=data.event[i];
+						event_content.innerHTML=data.event[i]+" ";
 						let content_html=data.event[i];
 						console.log(data.event[i]);
 						//this part is important, data.event_id[i] will be saved in a seperate variable.
@@ -284,7 +284,7 @@
 						//console.log(id);
 						each_event.appendChild(event_content);
 						let event_time=document.createElement("span");
-						event_time.innerHTML=data.datetime[i].substring(11,16);
+						event_time.innerHTML=data.datetime[i].substring(11,16)+" ";
 						each_event.appendChild(event_time);
 						let modify_button=document.createElement("button");
 						modify_button.setAttribute("id",id);
