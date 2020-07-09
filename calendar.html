@@ -48,7 +48,7 @@
 				let htmlDayObj = htmlWeekObj.appendChild(document.createElement("td"));
 				let day = days[j].toISOString();
 				//set id value
-				htmlDayObj.setAttribute("id",day);
+				//htmlDayObj.setAttribute("id",day);
 				let match_month=day.match(dayRegex)[2];
 				let match = day.match(dayRegex)[3];
 				let each= document.createElement("div");
@@ -56,9 +56,9 @@
 				each.id = day;
 				each.classList.add("td_div");
 				each.id=day;
-				console.log(day);
-				console.log(match_month);
-				console.log(currentMonth.month);
+				//console.log(day);
+				//console.log(match_month);
+				//console.log(currentMonth.month);
 				if(match_month!=currentMonth.month+1){
 					each.classList.add("not_this_month");
 				}
@@ -68,7 +68,7 @@
                 	$("#myform input[type=text]").val('');
 					$("#myform").show(500);
 					$('#dateId').val(id);
-					console.log(id);
+					//console.log(id);
 				});
 				each.textContent=match;
 				htmlDayObj.appendChild(each);
@@ -131,8 +131,8 @@
 					let each= document.createElement("div");
 					each.classList.add("td_div");
 					each.id=day;
-					console.log(match_month);
-					console.log(currentMonth.month);
+					//console.log(match_month);
+					//console.log(currentMonth.month);
 					if(match_month!=currentMonth.month+1){
 						each.classList.add("not_this_month");
 					}
@@ -165,7 +165,7 @@
 				})
 			.then(response => response.json())
 			.then(data => {
-				console.log(data.success ? "Succesfully added event" : `Add event failed ${data.message}`);
+				//console.log(data.success ? "Succesfully added event" : `Add event failed ${data.message}`);
 				if(data.success==true){
 					for(i=0;i<data.event.length;i++){
 						let each_event=document.createElement("div");
@@ -206,8 +206,10 @@
 			const content = document.getElementById("event_content").value;
 			const id = document.getElementById("dateId").value;
 			let date = document.getElementById(id);
-			//console.log(date);
-			date.appendChild(document.createTextNode(content));
+			console.log(date);
+			let each = document.createElement("div");
+			each.innerHTML = content;
+			date.appendChild(each);
 
 		}, false);
 	</script>
