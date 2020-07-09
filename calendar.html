@@ -65,6 +65,7 @@
 				let div_arr=document.getElementsByClassName("td_div");
 				//jquery for displaying pop up and event inside
 				$(each).click(function(){
+					$("#event_content").val("");
 					id=$(this).attr("id");
 					$("#myform").show(500);
 					$('#dateId').val(id);
@@ -192,28 +193,30 @@
 		//click add with add new event to the html table's corresponding div, then call addEvent.php and add event to the sql events table
 		document.getElementById("add").addEventListener("click",function(event){
 			event.preventDefault();
-			$("#myform").hide(400);
-			const content = document.getElementById("event_content").value;
-			const id = document.getElementById("dateId").value;
-			let date = document.getElementById(id);
-			console.log(date);
-			let each = document.createElement("div");
-			each.innerHTML = content;
-			date.appendChild(each);
-			console.log(id);
-			const idRegex = /\d{4}-\d{2}-\d{2}\w\d{2}:/g;
-			let sqlDate = id.match(idRegex);
-			let time = document.getElementById("time").value;
-			let dt = String(sqlDate+time+".000Z");
-			//console.log(dt);
-			const data = {'content': content, 'datetime': dt};
-			fetch('addEvent.php', {
-				method: "POST",
-				body: JSON.stringify(data)
-			})
-			.then(response => response.json())
-			.then(console.log(data))
-			.catch(error => console.error(error));
+			if(document.getElementById("event_content").value!=""){
+				$("#myform").hide(400);
+				const content = document.getElementById("event_content").value;
+				const id = document.getElementById("dateId").value;
+				let date = document.getElementById(id);
+				console.log(date);
+				let each = document.createElement("div");
+				each.innerHTML = content;
+				date.appendChild(each);
+				console.log(id);
+				const idRegex = /\d{4}-\d{2}-\d{2}\w\d{2}:/g;
+				let sqlDate = id.match(idRegex);
+				let time = document.getElementById("time").value;
+				let dt = String(sqlDate+time+".000Z");
+				//console.log(dt);
+				const data = {'content': content, 'datetime': dt};
+				fetch('addEvent.php', {
+					method: "POST",
+					body: JSON.stringify(data)
+				})
+				.then(response => response.json())
+				.then(console.log(data))
+				.catch(error => console.error(error));
+			}
 
 		}, false);
 
@@ -238,7 +241,7 @@
 					//loop through and print event contents, each with a modify and a delete button
 					for(i=0;i<data.event.length;i++){
 						console.log(data.event);
-						console.log(data.event_id[i]);
+						//console.log(data.event_id[i]);
 						let each_event=document.createElement("div");
 						let event_content=document.createElement("span");
 						event_content.innerHTML=data.event[i];
@@ -250,36 +253,70 @@
 						//later used to set button ids, so we can use them later in fetch("delete.php").
 						id="modify"+data.event_id[i];
 						id2="delete"+data.event_id[i];
-						console.log(id);
+						//console.log(id);
 						each_event.appendChild(event_content);
 						//modify button is not done
 						let modify_button=document.createElement("button");
 						modify_button.setAttribute("id",id);
 						modify_button.innerHTML="modify";
 						modify_button.addEventListener("click",function(){
-							console.log(this.id);
+							//console.log(this.id);
+							//check if another modify field already exists
+			
 							let regex=/\d+/;
 							function get_id(str){
 								if(match=regex.exec(str)){
 									return match[0];
 								}
 							}
-							let modify_id=get_id(this.id);
-							console.log(modify_id);
-							const data = {'modify_id': modify_id};
-							const token= document.getElementsByName("token").value;
-							fetch("modify.php", {
-									method: 'POST',
-									body: JSON.stringify(data),
-									headers: { 'content-type': 'application/json' 
-									//,'X-CSRF-Token': token 
-									}
+							let modify_id=get_id(this.id);//now modify id is event_id
+							let modify_text_id=id+"text";//create an id for modifying text
+							let modify_confirm_id=id+"confirm";
+							let form_id = id+"form";
+
+							if(document.getElementById(form_id)!=null){
+								let child = document.getElementById(form_id);
+								child.parentNode.removeChild(child);
+							}
+							//console.log(modify_button.parentElement);
+							//creating modify_form containing a text field and a button for modifying event
+							let modify_text = document.createElement("INPUT");
+							modify_text.setAttribute("type", "text");
+							modify_text.setAttribute("id", modify_text_id);
+							
+							let modify_confirm = document.createElement("button");
+							modify_confirm.innerHTML = "confirm";
+							modify_confirm.setAttribute("id", modify_confirm_id);
+							//console.log(modify_text_id);
+							
+							let modify_form = document.getElementById("dialog_events").appendChild(document.createElement("form"));
+							modify_form.setAttribute("id", form_id);
+							modify_form.appendChild(modify_text);
+							modify_form.appendChild(modify_confirm);
+
+							$(modify_confirm).click(function(){
+								
+								const modified_content = document.getElementById(modify_text_id).value;//get text from modify_text
+								//console.log(modified_content);
+								console.log(modify_id);
+								const data = {'modify_id': modify_id, 'changed_content': modified_content};
+								const token= document.getElementsByName("token").value;
+								fetch("modify.php", {
+										method: 'POST',
+										body: JSON.stringify(data),
+										headers: { 'content-type': 'application/json' 
+										//,'X-CSRF-Token': token 
+										}
+									})
+								.then(response => response.json())
+								.then(data => {
+									console.log(data.success ? "Succesfully modify event" : `Modify event failed ${data.message}`);
+									updateCalendar();
 								})
-							.then(response => response.json())
-							.then(data => {
-								console.log(data.success ? "Succesfully modify event" : `Modify event failed ${data.message}`);
+								.catch(err => console.error(err));
+
 							})
-							.catch(err => console.error(err));
+
 
 						});
 						each_event.appendChild(modify_button);
