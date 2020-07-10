@@ -45,9 +45,12 @@
 	<label for="checkbox_other">other</label>
 
 	<script>
+		//check all the checkbox by default
 		$('#checkbox_work').attr('checked', true);
 		$('#checkbox_social').attr('checked', true);
 		$('#checkbox_other').attr('checked', true);
+
+		//call updateCalendar whenever any checkbox is checked or unchecked
 		$('#checkbox_work').change(function(){
 			if($(this).is(':checked')) {
 				$(this).attr('checked', false);
@@ -234,6 +237,7 @@
 						let social_check=document.getElementById("checkbox_social").checked;
 						let other_check=document.getElementById("checkbox_other").checked;
 						let type=data.tag[i];
+						//don't do anything if this type of event is not supposed to be shown
 						if(type=="work"&&work_check!=true){
 						}
 						else if(type=="social"&&social_check!=true){
@@ -327,6 +331,7 @@
 				let work_check=document.getElementById("checkbox_work").checked;
 				let social_check=document.getElementById("checkbox_social").checked;
 				let other_check=document.getElementById("checkbox_other").checked;
+				//don't do anything if this type of event is not supposed to be shown
 				if(selected=="work"&&work_check!=true){
 				}
 				else if(selected=="social"&&social_check!=true){
