@@ -9,12 +9,13 @@
     $json_obj = json_decode($json_str, true);
     $content = $json_obj['content'];
     $dt = $json_obj['datetime'];
+    $tag= $json_obj['tag'];
     $username=$_SESSION['username'];
 
     require 'database.php';
 
     //update the table comments according to the edited version of comment
-    $stmt = $mysqli->prepare("insert into events (username, content, datetime) values (?,?,?)");
+    $stmt = $mysqli->prepare("insert into events (username, content, datetime, tag) values (?,?,?,?)");
     
     if(!$stmt){
         echo json_encode(array(
@@ -24,7 +25,7 @@
         exit;
     }
     
-    $stmt->bind_param('sss', $username, $content, $dt);
+    $stmt->bind_param('ssss', $username, $content, $dt, $tag);
     
     $stmt->execute();
     

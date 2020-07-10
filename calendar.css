@@ -2,6 +2,10 @@
     text-align: center;
     width: 100%;
 }
+.current_month{
+    font-size:25px;
+    font-weight: bold;
+}
 
 table, th, td {  
     border: 1px solid black;
@@ -14,8 +18,7 @@ td{
 
 }
 .td_div{
-    height:100px;
-    padding:5px;
+    height:150px;
     text-align:left;
 }
 .dialog{
@@ -27,14 +30,101 @@ td{
     top:200px;
     left:30%;
     display:none;
-    width:300px;
+    width:500px;
     text-align:center;
 }
 
+#events{
+    text-align:left;
+    padding-left:30px;
+    margin-bottom:50px;
+}
+.date_num{
+    margin-bottom:10px;
+}
+.one_event{
+    line-height:25px;
+}
+#dialog_events{
+    margin-top:30px;
+    padding-left:80px;
+}
 .not_this_month{
-    background-color:rgb(159, 158, 158);
+    background-color:rgb(198, 196, 196);
 }
 
 textarea{
     resize: none;
+    width:100%;
+    height:50px;
+}
+
+.work{
+    background-color: hotpink;
+}
+
+.social{
+    background-color: #ffe08a;
+}
+
+.other{
+    background-color:turquoise;
+}
+
+.workdot{
+    margin-right:10px;
+    height:5px;
+    width:5px;
+    background-color:hotpink;
+    border-radius:50%;
+    display:inline-block;
+}
+.socialdot{
+    margin-right:10px;
+    height:5px;
+    width:5px;
+    background-color:#ffe08a;
+    border-radius:50%;
+    display:inline-block;
+}
+.otherdot{
+    margin-right:10px;
+    height:5px;
+    width:5px;
+    background-color:turquoise;
+    border-radius:50%;
+    display:inline-block;
+}
+
+#container{
+    width:60%;
+    margin-left:19%;
+}
+
+#event_type{
+    position:relative;
+    float:right;
+}
+#type_text{
+    position:relative;
+    float:right;
+    margin-right:2px;
+}
+#new_event{
+    float:left;
+    position:relative;
+}
+
+#format{
+    margin-top:15px;
+    color:rgb(198, 59, 59);
+}
+
+.today{
+    background-color:rgb(198, 59, 59);
+    width:25px;
+    padding:5px;
+    text-align:center;
+    border-radius: 50%;
+    color:#fafafa;
 }

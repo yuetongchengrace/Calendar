@@ -24,7 +24,7 @@
 			
 	</script>
 	<table id="calendar_table">
-		<caption id="current_month">Current Month: </caption>
+		<caption class="current_month">Current Month: </caption>
 		<tr>
 		  <th>Sunday</th>
 		  <th>Monday</th>
@@ -42,11 +42,14 @@
 		(function(){Date.prototype.deltaDays=function(c){return new Date(this.getFullYear(),this.getMonth(),this.getDate()+c)};Date.prototype.getSunday=function(){return this.deltaDays(-1*this.getDay())}})();
 		function Week(c){this.sunday=c.getSunday();this.nextWeek=function(){return new Week(this.sunday.deltaDays(7))};this.prevWeek=function(){return new Week(this.sunday.deltaDays(-7))};this.contains=function(b){return this.sunday.valueOf()===b.getSunday().valueOf()};this.getDates=function(){for(var b=[],a=0;7>a;a++)b.push(this.sunday.deltaDays(a));return b}}
 		function Month(c,b){this.year=c;this.month=b;this.nextMonth=function(){return new Month(c+Math.floor((b+1)/12),(b+1)%12)};this.prevMonth=function(){return new Month(c+Math.floor((b-1)/12),(b+11)%12)};this.getDateObject=function(a){return new Date(this.year,this.month,a)};this.getWeeks=function(){var a=this.getDateObject(1),b=this.nextMonth().getDateObject(0),c=[],a=new Week(a);for(c.push(a);!a.contains(b);)a=a.nextWeek(),c.push(a);return c}};
-
-		
-		let currentMonth = new Month(2020, 06); //July 2020
-		
-		let htmlMonthObj = document.getElementById("current_month");
+		//get today's date
+		let d=new Date();
+		let mm=d.getMonth();
+		let dd = String(d.getDate()).padStart(2, '0');
+		console.log(mm);
+		console.log(dd);
+		let currentMonth = new Month(2020, mm); 
+		let htmlMonthObj = document.getElementsByClassName("current_month")[0];
 		htmlMonthObj.textContent += currentMonth.year+'.'+parseInt(currentMonth.month+1);
 		let weeks = currentMonth.getWeeks();
 		let dayRegex = /\d{2}/g;
@@ -84,7 +87,13 @@
 					displayEventByDay(id);
 					$("#time").val("");
 				});
-				each.textContent=match;
+				let text=document.createElement("div");
+				text.innerHTML=match;
+				text.classList="date_num";
+				each.appendChild(text);
+				if(dd==match){
+					each.firstChild.classList.add("today");
+				}
 				htmlDayObj.appendChild(each);
 				//call to function that displays event of that day
 				DisplayEventAjax(day,each);
@@ -112,6 +121,7 @@
 			let htmlWeekObj = htmlTableObj.appendChild(document.createElement("tr"));
 			htmlCaptionObj.appendChild(document.createTextNode("Current Month: "));
 			htmlCaptionObj.textContent += currentMonth.year+'.'+parseInt(currentMonth.month+1);
+			htmlCaptionObj.className="current_month";
 			for(let i=0; i<7; i++){
 				let htmlDayObj = htmlWeekObj.appendChild(document.createElement("th"));
 				let weekDays = ['Sunday', 'Monday','Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -137,13 +147,21 @@
 						each.classList.add("not_this_month");
 					}
 					$(each).click(function(){
+						$("#event_content").val("");
 						id=$(this).attr("id");
 						$("#myform input[type=text]").val('');
 						$("#myform").show(500);
 						$('#dateId').val(id);
 						displayEventByDay(id);
+						$("#time").val("");
 					});
-                	each.textContent=match;
+					let text=document.createElement("div");
+					text.innerHTML=match;
+					text.classList="date_num";
+					each.appendChild(text);
+					if(dd==match&&mm+1==match_month){
+						each.firstChild.classList.add("today");
+					}
 					htmlDayObj.appendChild(each);
 					//call to function that displays event of that day
 					DisplayEventAjax(day,each);
@@ -169,6 +187,7 @@
 				console.log(data.success ? "Succesfully display event" : `Display event failed ${data.message}`);
 				if(data.success==true){
 					for(i=0;i<data.event.length;i++){
+						let type=data.tag[i];
 						let each_event=document.createElement("div");
 						let each_event_title=document.createElement("span");
 						each_event_title.innerHTML=data.event[i]+" ";
@@ -176,6 +195,9 @@
 						each_event_time.innerHTML=data.datetime[i].substring(11, 16);
 						each_event.appendChild(each_event_title);
 						each_event.appendChild(each_event_time);
+						each_event.classList="one_event";
+						each_event.classList+=" "+type;
+						console.log(each_event);
 						each.appendChild(each_event);
 						
 					}
@@ -188,15 +210,29 @@
 	</script>
 	<!--Pop up window html-->
 	<div class="dialog" id="myform">
-		<div id="today"></div>
-		<div id="dialog_events"></div>
+		<div id="events">
+			<div id="today"></div>
+			<div id="dialog_events"></div>
+		</div>
 		<form>
-			<div>Event:</div>
-			<textarea id="event_content"></textarea>
+			<div id="container">
+				<div id="span_container">
+					<span id="new_event">New Event: </span>
+					<span id="event_type">
+						<select name="type" id="tag_value">
+							<option value="work" class="work">work</option>
+							<option value="social" class="social">social</option>
+							<option value="other" class="other">other</option>
+						</select>
+					</span>
+					<span id="type_text">Type:</span>
+				</div>
+				<textarea id="event_content"></textarea>
+			</div>
 			<div>
 				<span>Time:</span>
 				<input type="text" id="time"/>
-				<div>Please write in the format: HH:MM</div>
+				<div id="format">Please write in the format: HH:MM</div>
 			</div>
 			<input type="hidden" id="dateId" value="">
 			<button id="add">add</button>
@@ -205,6 +241,13 @@
 	</div>
 
 	<script>
+		//change background color of select drop down based on what is selected
+		document.getElementById("tag_value").className="work";
+		$("#tag_value").change(function(){
+			document.getElementById("tag_value").className="";
+			let selected=document.getElementById("tag_value").value;
+			document.getElementById("tag_value").className=selected;
+		});
 		//click cancel can close pop up window
 		document.getElementById("cancel_add").addEventListener("click",function(event){
 			event.preventDefault();
@@ -215,6 +258,8 @@
 			event.preventDefault();
 			if(document.getElementById("event_content").value!=""){
 				$("#myform").hide(400);
+				let selected=document.getElementById("tag_value").value;
+				console.log(selected);
 				const content = document.getElementById("event_content").value;
 				const id = document.getElementById("dateId").value;
 				let date = document.getElementById(id);
@@ -226,14 +271,17 @@
 				each_event_time.innerHTML=document.getElementById("time").value;
 				each.appendChild(each_event_title);
 				each.appendChild(each_event_time);
+				each.classList="one_event";
+				each.classList+=" "+selected;
 				date.appendChild(each);
+				console.log(each.classList);
 				console.log(id);
 				const idRegex = /\d{4}-\d{2}-\d{2}\w/g;
 				let sqlDate = id.match(idRegex);
 				let time = document.getElementById("time").value;
 				let dt = String(sqlDate+time+":00.000Z");
 				//console.log(dt);
-				const data = {'content': content, 'datetime': dt};
+				const data = {'content': content, 'datetime': dt,'tag':selected};
 				fetch('addEvent.php', {
 					method: "POST",
 					body: JSON.stringify(data)
@@ -271,6 +319,10 @@
 						console.log(data.event);
 						//console.log(data.event_id[i]);
 						let each_event=document.createElement("div");
+						let event_tag=document.createElement("span");
+						let tag_type=data.tag[i];
+						event_tag.classList=tag_type+"dot";
+						//console.log(event_tag);
 						let event_content=document.createElement("span");
 						event_content.innerHTML=data.event[i]+" ";
 						let content_html=data.event[i];
@@ -282,6 +334,7 @@
 						id="modify"+data.event_id[i];
 						id2="delete"+data.event_id[i];
 						//console.log(id);
+						each_event.appendChild(event_tag);
 						each_event.appendChild(event_content);
 						let event_time=document.createElement("span");
 						event_time.innerHTML=data.datetime[i].substring(11,16)+" ";
