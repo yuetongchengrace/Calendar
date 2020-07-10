@@ -6,7 +6,10 @@
     font-size:25px;
     font-weight: bold;
 }
-
+#back_to_current_month{
+    float:right;
+    margin-right:30px;
+}
 table, th, td {  
     border: 1px solid black;
     border-collapse: collapse;

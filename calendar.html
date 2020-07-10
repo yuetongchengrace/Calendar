@@ -11,6 +11,7 @@
 	<button type="button" id="previous_month_btn">Last Month</button>
 	<button type="button" id="next_month_btn">Next Month</button>
 	<a href="logout.php" id="login_or_out" ></a>
+	<button type="button" id="back_to_current_month">Back to current month</button>
 	<br>
 	<script>
 		let htmlButtonObj = document.getElementById("login_or_out");
@@ -35,7 +36,7 @@
 		  <th>Saturday</th>
 		</tr>
 		
-	  </table>
+	</table>
 
 
 	<script>
@@ -112,11 +113,19 @@
 			updateCalendar(); // Whenever the month is updated, we'll need to re-render the calendar in HTML
 			//alert("The new month is "+currentMonth.month+" "+currentMonth.year);
 		}, false);
-		
+		document.getElementById("back_to_current_month").addEventListener("click",function(event){
+			let mm=d.getMonth();
+			let current = new Month(2020, mm); 
+			currentMonth=current;
+			updateCalendar();
+		},false);
 		//update calendar (used when user clicked to another month)
 		function updateCalendar(){
 			let htmlTableObj = document.getElementById("calendar_table");
 			htmlTableObj.innerHTML = "";
+			console.log(htmlTableObj);
+			console.log(currentMonth);
+			console.log(currentMonth.getWeeks());
 			let htmlCaptionObj = htmlTableObj.appendChild(document.createElement("caption"));
 			let htmlWeekObj = htmlTableObj.appendChild(document.createElement("tr"));
 			htmlCaptionObj.appendChild(document.createTextNode("Current Month: "));
