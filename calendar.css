@@ -18,11 +18,14 @@ table, th, td {
 
 td{
     width: 14.2%;
-
 }
 .td_div{
+    position: relative;
     height:150px;
+    display:block;
     text-align:left;
+    overflow: scroll;
+    text-overflow: ellipsis;
 }
 
 .td_div:hover{

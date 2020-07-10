@@ -37,9 +37,44 @@
 		</tr>
 		
 	</table>
-
+	<input type="checkbox" id="checkbox_work" name="show_work" value="work">
+	<label for="checkbox_work">work</label>
+	<input type="checkbox" id="checkbox_social" name="show_social" value="work">
+	<label for="checkbox_social">social</label>
+	<input type="checkbox" id="checkbox_other" name="show_other" value="other">
+	<label for="checkbox_other">other</label>
 
 	<script>
+		$('#checkbox_work').attr('checked', true);
+		$('#checkbox_social').attr('checked', true);
+		$('#checkbox_other').attr('checked', true);
+		$('#checkbox_work').change(function(){
+			if($(this).is(':checked')) {
+				$(this).attr('checked', false);
+				updateCalendar();
+			} else {
+				$(this).attr('checked', true);
+				updateCalendar();
+			}
+		});
+		$('#checkbox_social').change(function(){
+			if($(this).is(':checked')) {
+				$(this).attr('checked', false);
+				updateCalendar();
+			} else {
+				$(this).attr('checked', true);
+				updateCalendar();
+			}
+		});
+		$('#checkbox_other').change(function(){
+			if($(this).is(':checked')) {
+				$(this).attr('checked', false);
+				updateCalendar();
+			} else {
+				$(this).attr('checked', true);
+				updateCalendar();
+			}
+		});
 		(function(){Date.prototype.deltaDays=function(c){return new Date(this.getFullYear(),this.getMonth(),this.getDate()+c)};Date.prototype.getSunday=function(){return this.deltaDays(-1*this.getDay())}})();
 		function Week(c){this.sunday=c.getSunday();this.nextWeek=function(){return new Week(this.sunday.deltaDays(7))};this.prevWeek=function(){return new Week(this.sunday.deltaDays(-7))};this.contains=function(b){return this.sunday.valueOf()===b.getSunday().valueOf()};this.getDates=function(){for(var b=[],a=0;7>a;a++)b.push(this.sunday.deltaDays(a));return b}}
 		function Month(c,b){this.year=c;this.month=b;this.nextMonth=function(){return new Month(c+Math.floor((b+1)/12),(b+1)%12)};this.prevMonth=function(){return new Month(c+Math.floor((b-1)/12),(b+11)%12)};this.getDateObject=function(a){return new Date(this.year,this.month,a)};this.getWeeks=function(){var a=this.getDateObject(1),b=this.nextMonth().getDateObject(0),c=[],a=new Week(a);for(c.push(a);!a.contains(b);)a=a.nextWeek(),c.push(a);return c}};
@@ -179,7 +214,6 @@
 		}
 		//display all events of that day in the corresponding div
 		function DisplayEventAjax(day,each) {
-			
 			const data = {'day': day};
 			// Make a URL-encoded string for passing POST data:
 			//const data = { 'username': username, 'password': password };
@@ -196,19 +230,36 @@
 				console.log(data.success ? "Succesfully display event" : `Display event failed ${data.message}`);
 				if(data.success==true){
 					for(i=0;i<data.event.length;i++){
+						let work_check=document.getElementById("checkbox_work").checked;
+						let social_check=document.getElementById("checkbox_social").checked;
+						let other_check=document.getElementById("checkbox_other").checked;
 						let type=data.tag[i];
-						let each_event=document.createElement("div");
-						let each_event_title=document.createElement("span");
-						each_event_title.innerHTML=data.event[i]+" ";
-						let each_event_time=document.createElement("span");
-						each_event_time.innerHTML=data.datetime[i].substring(11, 16);
-						each_event.appendChild(each_event_title);
-						each_event.appendChild(each_event_time);
-						each_event.classList="one_event";
-						each_event.classList+=" "+type;
-						console.log(each_event);
-						each.appendChild(each_event);
-						
+						if(type=="work"&&work_check!=true){
+						}
+						else if(type=="social"&&social_check!=true){
+						}
+						else if (type=="other"&&other_check!=true){
+						}
+						else{
+							type=data.tag[i];
+							let each_event=document.createElement("div");
+							let each_event_title=document.createElement("span");
+							each_event_title.innerHTML=data.event[i]+" ";
+							let each_event_time=document.createElement("span");
+							each_event_time.innerHTML=data.datetime[i].substring(11, 16);
+							each_event.appendChild(each_event_title);
+							each_event.appendChild(each_event_time);
+							each_event.classList="one_event";
+							each_event.classList+=" "+type;
+							console.log(each_event);
+							each.appendChild(each_event);
+							// if(work_check!=true){
+							// 	let not_display=document.getElementsByClassName("work");
+							// 	for(i=0;i<not_display.length;i++){
+							// 		each.removeChild(not_display[i]);
+							// 	}
+							// }
+						}
 					}
 				}
 			})
@@ -273,18 +324,30 @@
 				const id = document.getElementById("dateId").value;
 				let date = document.getElementById(id);
 				console.log(date);
-				let each = document.createElement("div");
-				let each_event_title=document.createElement("span");
-				each_event_title.innerHTML=content+" ";
-				let each_event_time=document.createElement("span");
-				each_event_time.innerHTML=document.getElementById("time").value;
-				each.appendChild(each_event_title);
-				each.appendChild(each_event_time);
-				each.classList="one_event";
-				each.classList+=" "+selected;
-				date.appendChild(each);
-				console.log(each.classList);
-				console.log(id);
+				let work_check=document.getElementById("checkbox_work").checked;
+				let social_check=document.getElementById("checkbox_social").checked;
+				let other_check=document.getElementById("checkbox_other").checked;
+				if(selected=="work"&&work_check!=true){
+				}
+				else if(selected=="social"&&social_check!=true){
+				}
+				else if (selected=="other"&&other_check!=true){
+				}
+				else{
+					let each = document.createElement("div");
+					let each_event_title=document.createElement("span");
+					each_event_title.innerHTML=content+" ";
+					let each_event_time=document.createElement("span");
+					each_event_time.innerHTML=document.getElementById("time").value;
+					each.appendChild(each_event_title);
+					each.appendChild(each_event_time);
+					each.classList="one_event";
+					each.classList+=" "+selected;
+					date.appendChild(each);
+					
+					console.log(each.classList);
+					console.log(id);
+				}
 				const idRegex = /\d{4}-\d{2}-\d{2}\w/g;
 				let sqlDate = id.match(idRegex);
 				let time = document.getElementById("time").value;
