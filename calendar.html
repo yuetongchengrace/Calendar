@@ -268,6 +268,34 @@
 				}
 			})
 			.catch(err => console.error(err));
+
+			//show group events
+			fetch("showGroupEvent.php", {
+					method: 'POST',
+					body: JSON.stringify(data),
+					headers: { 'content-type': 'application/json' 
+					//,'X-CSRF-Token': token 
+					}
+				})
+			.then(response => response.json())
+			.then(data => {
+				console.log(data.success ? "Succesfully display event" : `Display event failed ${data.message}`);
+				if(data.success==true){
+					for(i=0;i<data.event.length;i++){
+						let each_event=document.createElement("div");
+						let each_event_title=document.createElement("span");
+						each_event_title.innerHTML=data.event[i]+" ";
+						let each_event_time=document.createElement("span");
+						each_event_time.innerHTML=data.time[i].substring(11, 16);
+						each_event.appendChild(each_event_title);
+						each_event.appendChild(each_event_time);
+						each_event.classList="one_event";
+						console.log(each_event);
+						each.appendChild(each_event);
+					}
+				}
+			})
+			.catch(err => console.error(err));
 			
 		}
 
@@ -299,12 +327,77 @@
 				<div id="format">Please write in the format: HH:MM</div>
 			</div>
 			<input type="hidden" id="dateId" value="">
-			<button id="add">add</button>
+			<button id="add">Add</button>
+			<button id="add_group">Add group event</button>
 			<button id="cancel_add">X</button>
 		</form>
 	</div>
 
+	<div class="dialog" id="group_popup">
+		<form id="group_form">
+			Enter usernames of your group members here:<br>
+			<input type="text" id="group_member1"></input>
+			<button id="add_another_user">+</button><br>
+		</form>
+		<button id="confirm_group">Confirm</button>
+	</div>
+
 	<script>
+		//add another group member
+		let group_count = 1;
+		document.getElementById("add_another_user").addEventListener("click", function(event){
+			event.preventDefault();
+			console.log("add");
+			let this_member = document.createElement("input");
+			this_member.setAttribute("type", "text");
+			group_count += 1;
+			let this_member_id = "group_member"+String(group_count);
+			this_member.setAttribute("id", this_member_id);
+			//this_member.textContent = 
+			document.getElementById("group_form").appendChild(this_member);
+		})
+
+		//add group event button listener
+		document.getElementById("add_group").addEventListener("click", function(event){
+			event.preventDefault();
+			//get time and event content
+			const id = document.getElementById("dateId").value;
+			const idRegex = /\d{4}-\d{2}-\d{2}\w/g;
+			let sqlDate = id.match(idRegex);
+			let time = document.getElementById("time").value;
+			let dt = String(sqlDate+time+":00.000Z");
+			let content = document.getElementById("event_content").value;
+			console.log(dt);
+			console.log(content);
+
+			if(content!=""){
+				$("#myform").hide(400);
+				$("#group_popup").show(400);
+				document.getElementById("confirm_group").addEventListener("click", function(event2){
+					event2.preventDefault();
+					//add to group_events
+					for(let i=1; i<=group_count; i++){
+						let member_id="group_member"+String(i);
+						if(document.getElementById(member_id).value!=""){
+							let group_member = document.getElementById(member_id).value;
+							const data = {'content': content, 'datetime': dt, 'username': group_member};
+							fetch('addGroupEvent.php', {
+								method: "POST",
+								body: JSON.stringify(data)
+							})
+							.then(console.log(data))
+							.catch(error => console.error(error));
+						}
+						else{/*do nothing if there's no username input*/}
+					}
+					event2.preventDefault();
+					$("#group_popup").hide(400);
+					$("#myform").show(400);
+				}, false)
+			}
+		}, false)
+
+
 		//change background color of select drop down based on what is selected
 		document.getElementById("tag_value").className="work";
 		$("#tag_value").change(function(){
@@ -410,6 +503,7 @@
 						//later used to set button ids, so we can use them later in fetch("delete.php").
 						id="modify"+data.event_id[i];
 						id2="delete"+data.event_id[i];
+						id3="group"+data.event_id[i];
 						//console.log(id);
 						each_event.appendChild(event_tag);
 						each_event.appendChild(event_content);
@@ -529,6 +623,52 @@
 
 						});
 						each_event.appendChild(delete_button);
+
+						let group_button = document.createElement("button");
+						group_button.setAttribute("id", id3);
+						group_button.innerHTML = "Add group event";
+						//add group event button listener in pop up window
+						group_button.addEventListener("click", function(){
+							event.preventDefault();
+							//get time and event content
+							const id = document.getElementById("dateId").value;
+							const idRegex = /\d{4}-\d{2}-\d{2}\w/g;
+							let sqlDate = id.match(idRegex);
+							let time = document.getElementById("time").value;
+							let dt = String(sqlDate+time+":00.000Z");
+							let content = event_content.innerHTML;
+							console.log(dt);
+							console.log(content);
+
+							if(content!=""){
+								$("#myform").hide(400);
+								$("#group_popup").show(400);
+								document.getElementById("confirm_group").addEventListener("click", function(event2){
+									event2.preventDefault();
+									//add to group_events
+									for(let i=1; i<=group_count; i++){
+										let member_id="group_member"+String(i);
+										if(document.getElementById(member_id).value!=""){
+											let group_member = document.getElementById(member_id).value;
+											const data = {'content': content, 'datetime': dt, 'username': group_member};
+											fetch('addGroupEvent.php', {
+												method: "POST",
+												body: JSON.stringify(data)
+											})
+											.then(console.log(data))
+											.catch(error => console.error(error));
+										}
+										else{/*do nothing if there's no username input*/}
+									}
+									event2.preventDefault();
+									$("#group_popup").hide(400);
+									$("#myform").show(400);
+								}, false)
+							}
+						})
+	
+
+						each_event.appendChild(group_button);
 						document.getElementById("dialog_events").appendChild(each_event);
 					}
 				}

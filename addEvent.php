@@ -14,7 +14,6 @@
 
     require 'database.php';
 
-    //update the table comments according to the edited version of comment
     $stmt = $mysqli->prepare("insert into events (username, content, datetime, tag) values (?,?,?,?)");
     
     if(!$stmt){
