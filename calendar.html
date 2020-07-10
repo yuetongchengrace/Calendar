@@ -378,6 +378,7 @@
 							modify_form.appendChild(modify_confirm);
 
 							$(modify_confirm).click(function(){
+								event.preventDefault();
 								if(document.getElementById(modify_text_id).value!=""){
 								
 									const modified_content = document.getElementById(modify_text_id).value;//get text from modify_text
@@ -396,8 +397,10 @@
 									.then(data => {
 										console.log(data.success ? "Succesfully modify event" : `Modify event failed ${data.message}`);
 										updateCalendar();
+										$("#myform").hide(400);
 									})
 									.catch(err => console.error(err));
+									
 								}
 							})
 
