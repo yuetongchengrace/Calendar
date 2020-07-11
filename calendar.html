@@ -18,7 +18,7 @@
 		fetch("checkUser.php")
 			.then(response => response.json())
 			.then(function(response) {
-				console.log(JSON.stringify(response.message));
+				//console.log(JSON.stringify(response.message));
 				document.getElementById("login_or_out").textContent = response.message;
 			})
 			.catch(err => console.error(err));
@@ -85,14 +85,11 @@
 		let d=new Date();
 		let mm=d.getMonth();
 		let dd = String(d.getDate()).padStart(2, '0');
-		console.log(mm);
-		console.log(dd);
 		let currentMonth = new Month(2020, mm); 
 		let htmlMonthObj = document.getElementsByClassName("current_month")[0];
 		htmlMonthObj.textContent += currentMonth.year+'.'+parseInt(currentMonth.month+1);
 		let weeks = currentMonth.getWeeks();
 		let dayRegex = /\d{2}/g;
-		//console.log(weeks[0].getDates()[0].toISOString());
 		let htmlTableObj = document.getElementById("calendar_table");
 		for(let i=0; i<weeks.length; i++){
 			let htmlWeekObj = htmlTableObj.appendChild(document.createElement("tr"));
@@ -103,16 +100,11 @@
 				let day = days[j].toISOString();
 				
 				//set id value
-				//htmlDayObj.setAttribute("id",day);
 				let match_month=day.match(dayRegex)[2];
 				let match = day.match(dayRegex)[3];
 				let each= document.createElement("div");
 				each.setAttribute("id", day);
 				each.classList.add("td_div");
-				//each.id=day;
-				//console.log(day);
-				//console.log(match_month);
-				//console.log(currentMonth.month);
 				if(match_month!=currentMonth.month+1){
 					each.classList.add("not_this_month");
 				}
@@ -161,9 +153,6 @@
 		function updateCalendar(){
 			let htmlTableObj = document.getElementById("calendar_table");
 			htmlTableObj.innerHTML = "";
-			console.log(htmlTableObj);
-			console.log(currentMonth);
-			console.log(currentMonth.getWeeks());
 			let htmlCaptionObj = htmlTableObj.appendChild(document.createElement("caption"));
 			let htmlWeekObj = htmlTableObj.appendChild(document.createElement("tr"));
 			htmlCaptionObj.appendChild(document.createTextNode("Current Month: "));
@@ -222,15 +211,16 @@
 			//const data = { 'username': username, 'password': password };
 			const token= document.getElementsByName("token").value;
 			fetch("showevent.php", {
-					method: 'POST',
-					body: JSON.stringify(data),
-					headers: { 'content-type': 'application/json' 
-					//,'X-CSRF-Token': token 
-					}
-				})
+				method: 'POST',
+				body: JSON.stringify(data),
+				headers: { 'content-type': 'application/json' 
+				//,'X-CSRF-Token': token 
+				}
+			})
 			.then(response => response.json())
 			.then(data => {
-				console.log(data.success ? "Succesfully display event" : `Display event failed ${data.message}`);
+				//console.log(data);
+				//console.log(data.success ? "Succesfully display event" : `Display event failed ${data.message}`);
 				if(data.success==true){
 					for(i=0;i<data.event.length;i++){
 						let work_check=document.getElementById("checkbox_work").checked;
@@ -255,14 +245,7 @@
 							each_event.appendChild(each_event_time);
 							each_event.classList="one_event";
 							each_event.classList+=" "+type;
-							console.log(each_event);
 							each.appendChild(each_event);
-							// if(work_check!=true){
-							// 	let not_display=document.getElementsByClassName("work");
-							// 	for(i=0;i<not_display.length;i++){
-							// 		each.removeChild(not_display[i]);
-							// 	}
-							// }
 						}
 					}
 				}
@@ -279,7 +262,8 @@
 				})
 			.then(response => response.json())
 			.then(data => {
-				console.log(data.success ? "Succesfully display event" : `Display event failed ${data.message}`);
+				console.log(data);
+				//console.log(data.success ? "Succesfully display event" : `Display event failed ${data.message}`);
 				if(data.success==true){
 					for(i=0;i<data.event.length;i++){
 						let each_event=document.createElement("div");
@@ -290,7 +274,6 @@
 						each_event.appendChild(each_event_title);
 						each_event.appendChild(each_event_time);
 						each_event.classList="one_event";
-						console.log(each_event);
 						each.appendChild(each_event);
 					}
 				}
@@ -347,7 +330,6 @@
 		let group_count = 1;
 		document.getElementById("add_another_user").addEventListener("click", function(event){
 			event.preventDefault();
-			console.log("add");
 			let this_member = document.createElement("input");
 			this_member.setAttribute("type", "text");
 			group_count += 1;
@@ -367,8 +349,6 @@
 			let time = document.getElementById("time").value;
 			let dt = String(sqlDate+time+":00.000Z");
 			let content = document.getElementById("event_content").value;
-			console.log(dt);
-			console.log(content);
 
 			if(content!=""){
 				$("#myform").hide(400);
@@ -408,6 +388,7 @@
 		//click cancel can close pop up window
 		document.getElementById("cancel_add").addEventListener("click",function(event){
 			event.preventDefault();
+			updateCalendar();
 			$("#myform").hide(400);
 		});
 		//click add with add new event to the html table's corresponding div, then call addEvent.php and add event to the sql events table
@@ -416,11 +397,9 @@
 			if(document.getElementById("event_content").value!=""){
 				$("#myform").hide(400);
 				let selected=document.getElementById("tag_value").value;
-				console.log(selected);
 				const content = document.getElementById("event_content").value;
 				const id = document.getElementById("dateId").value;
 				let date = document.getElementById(id);
-				console.log(date);
 				let work_check=document.getElementById("checkbox_work").checked;
 				let social_check=document.getElementById("checkbox_social").checked;
 				let other_check=document.getElementById("checkbox_other").checked;
@@ -443,14 +422,11 @@
 					each.classList+=" "+selected;
 					date.appendChild(each);
 					
-					console.log(each.classList);
-					console.log(id);
 				}
 				const idRegex = /\d{4}-\d{2}-\d{2}\w/g;
 				let sqlDate = id.match(idRegex);
 				let time = document.getElementById("time").value;
 				let dt = String(sqlDate+time+":00.000Z");
-				//console.log(dt);
 				const data = {'content': content, 'datetime': dt,'tag':selected};
 				fetch('addEvent.php', {
 					method: "POST",
@@ -496,7 +472,7 @@
 						let event_content=document.createElement("span");
 						event_content.innerHTML=data.event[i]+" ";
 						let content_html=data.event[i];
-						console.log(data.event[i]);
+						//console.log(data.event[i]);
 						//this part is important, data.event_id[i] will be saved in a seperate variable.
 						//I added "modify" or "delete" in the beginning to distinguish different ids.
 						//id is for modify buttons and id2 is for delete buttons.
@@ -508,6 +484,7 @@
 						each_event.appendChild(event_tag);
 						each_event.appendChild(event_content);
 						let event_time=document.createElement("span");
+						let this_time=data.datetime[i].substring(11,16);
 						event_time.innerHTML=data.datetime[i].substring(11,16)+" ";
 						each_event.appendChild(event_time);
 						let modify_button=document.createElement("button");
@@ -554,7 +531,7 @@
 								
 									const modified_content = document.getElementById(modify_text_id).value;//get text from modify_text
 									//console.log(modified_content);
-									console.log(modify_id);
+									//onsole.log(modify_id);
 									const data = {'modify_id': modify_id, 'changed_content': modified_content};
 									const token= document.getElementsByName("token").value;
 									fetch("modify.php", {
@@ -588,7 +565,6 @@
 						delete_button.innerHTML="delete";
 						//
 						delete_button.addEventListener("click",function(){
-							console.log(this.id);
 							let regex=/\d+/;
 							function get_id(str){
 								if(match=regex.exec(str)){
@@ -596,7 +572,6 @@
 								}
 							}
 							let delete_id=get_id(this.id);
-							console.log(delete_id);
 							const data = {'delete_id': delete_id};
 							const token= document.getElementsByName("token").value;
 							fetch("delete.php", {
@@ -608,7 +583,7 @@
 								})
 							.then(response => response.json())
 							.then(data => {
-								console.log(data.success ? "Succesfully delete event" : `Delete event failed ${data.message}`);
+								//console.log(data.success ? "Succesfully delete event" : `Delete event failed ${data.message}`);
 								if(data.success==true){
 									//remove the parent div node of this delete_button from the pop up window
 									let parent=delete_button.parentNode;
@@ -634,17 +609,30 @@
 							const id = document.getElementById("dateId").value;
 							const idRegex = /\d{4}-\d{2}-\d{2}\w/g;
 							let sqlDate = id.match(idRegex);
-							let time = document.getElementById("time").value;
-							let dt = String(sqlDate+time+":00.000Z");
+							let dt = String(sqlDate+this_time+":00.000Z");
 							let content = event_content.innerHTML;
-							console.log(dt);
-							console.log(content);
 
 							if(content!=""){
 								$("#myform").hide(400);
 								$("#group_popup").show(400);
 								document.getElementById("confirm_group").addEventListener("click", function(event2){
 									event2.preventDefault();
+									//delete from events table
+									let delete_data = id2; 
+									let regex=/\d+/;
+									function get_id(str){
+										if(match=regex.exec(str)){
+											return match[0];
+										}
+									}
+									delete_data = get_id(id2);
+									const data = {'delete_id': delete_data};
+									fetch('delete.php',{
+										method: "POST",
+										body: JSON.stringify(data)
+									})
+									.then(console.log(data))
+									.catch(error=>console.error(error));
 									//add to group_events
 									for(let i=1; i<=group_count; i++){
 										let member_id="group_member"+String(i);
@@ -660,9 +648,8 @@
 										}
 										else{/*do nothing if there's no username input*/}
 									}
-									event2.preventDefault();
 									$("#group_popup").hide(400);
-									$("#myform").show(400);
+									updateCalendar();
 								}, false)
 							}
 						})
@@ -671,6 +658,152 @@
 						each_event.appendChild(group_button);
 						document.getElementById("dialog_events").appendChild(each_event);
 					}
+				}
+			})
+			.catch(err => console.error(err));
+
+			fetch("showGroupEvent.php", {
+					method: 'POST',
+					body: JSON.stringify(data),
+					headers: { 'content-type': 'application/json' 
+					//,'X-CSRF-Token': token 
+					}
+				})
+			.then(response => response.json())
+			.then(data => {
+				//console.log(data.success ? "Succesfully display event" : `Display event failed ${data.message}`);
+				if(data.success==true){
+					for(i=0;i<data.event.length;i++){
+						//console.log(data.event);
+						let each_event=document.createElement("div");
+						let event_content=document.createElement("span");
+						event_content.innerHTML=data.event[i]+" ";
+						let dmTime=data.time[i];
+						//console.log(data.time[i]);
+
+						id="group_modify"+data.event_id[i];
+						id2="group_delete"+data.event_id[i];
+						//console.log(id);
+						//each_event.appendChild(event_tag);
+						each_event.appendChild(event_content);
+						let event_time=document.createElement("span");
+						let this_time=data.time[i].substring(11,16);
+						event_time.innerHTML=data.time[i].substring(11,16)+" ";
+						each_event.appendChild(event_time);
+						let modify_button=document.createElement("button");
+						modify_button.setAttribute("id",id);
+						modify_button.innerHTML="modify";
+						modify_button.addEventListener("click",function(){
+							//console.log(this.id);
+							//check if another modify field already exists
+			
+							let regex=/\d+/;
+							function get_id(str){
+								if(match=regex.exec(str)){
+									return match[0];
+								}
+							}
+							let modify_id=get_id(this.id);//now modify id is event_id
+							let modify_text_id=id+"text";//create an id for modifying text
+							let modify_confirm_id=id+"confirm";
+							let form_id = id+"form";
+
+							if(document.getElementById(form_id)!=null){
+								let child = document.getElementById(form_id);
+								child.parentNode.removeChild(child);
+							}
+							//creating modify_form containing a text field and a button for modifying event
+							let modify_text = document.createElement("INPUT");
+							modify_text.setAttribute("type", "text");
+							modify_text.setAttribute("id", modify_text_id);
+							
+							let modify_confirm = document.createElement("button");
+							modify_confirm.innerHTML = "confirm";
+							modify_confirm.setAttribute("id", modify_confirm_id);
+							
+							
+							let modify_form = document.getElementById("dialog_events").appendChild(document.createElement("form"));
+							modify_form.setAttribute("id", form_id);
+							modify_form.appendChild(modify_text);
+							modify_form.appendChild(modify_confirm);
+
+							$(modify_confirm).click(function(){
+								event.preventDefault();
+								if(document.getElementById(modify_text_id).value!=""){
+								
+									const modified_content = document.getElementById(modify_text_id).value;//get text from modify_text
+									console.log(dmTime);
+									let old_content = event_content.innerHTML.trim();
+									const data = {'modify_content': old_content, 'changed_content': modified_content, 'time':dmTime};
+									const token= document.getElementsByName("token").value;
+									fetch("groupModify.php", {
+											method: 'POST',
+											body: JSON.stringify(data),
+											headers: { 'content-type': 'application/json' 
+											//,'X-CSRF-Token': token 
+											}
+										})
+									.then(data => {
+										console.log(data.success ? "Succesfully modify event" : `Modify event failed ${data.message}`);
+										updateCalendar();
+										$("#myform").hide(400);
+									})
+									.catch(err => console.error(err));
+									
+								}
+							})
+
+
+						});
+						each_event.appendChild(modify_button);
+
+						//click delete button will fetch delete.php which deletes event from the events table using event_id we passed in.
+						//Set id of this specific delete_button to be id2(aka "delete"+data.event_id[i] from earlier)
+						//We need to use regular expression and match out the integer part (discard the "delete" part).
+						//fetch "delete".php wil delete event with this specific id (auto_increment) so it is unique.
+						let delete_button=document.createElement("button");
+						delete_button.setAttribute("id",id2);
+						delete_button.innerHTML="delete";
+						//
+						delete_button.addEventListener("click",function(){
+							//console.log(this.id);
+							let regex=/\d+/;
+							function get_id(str){
+								if(match=regex.exec(str)){
+									return match[0];
+								}
+							}
+							let delete_id=get_id(this.id);
+							let old_content = event_content.innerHTML.trim();
+							const data = {'old_content': old_content, 'time': dmTime};
+							const token= document.getElementsByName("token").value;
+							fetch("groupDelete.php", {
+									method: 'POST',
+									body: JSON.stringify(data),
+									headers: { 'content-type': 'application/json' 
+									//,'X-CSRF-Token': token 
+									}
+								})
+							.then(response => response.json())
+							.then(data => {
+								//console.log(data.success ? "Succesfully delete event" : `Delete event failed ${data.message}`);
+								if(data.success==true){
+									//remove the parent div node of this delete_button from the pop up window
+									let parent=delete_button.parentNode;
+									document.getElementById("dialog_events").removeChild(parent);
+									//updateCalendar so we won't see the removed event on the html table.
+									//might not be the most efficient.Does not refresh the page but will
+									//call updateCalendar again and display all events again without the deleted event
+									updateCalendar();
+								}
+							})
+							.catch(err => console.error(err));
+
+						});
+						each_event.appendChild(delete_button);
+						document.getElementById("dialog_events").appendChild(each_event);
+					}
+
 				}
 			})
 			.catch(err => console.error(err));

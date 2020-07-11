@@ -25,7 +25,7 @@
     $stmt1->store_result();
     if($stmt1->num_rows==0){
         $stmt1->close;
-        $stmt2 = $mysqli->prepare("insert into group_events (username, content, time) values (?,?,?)");
+        $stmt2 = $mysqli->prepare("insert into group_events (username, content, time, host) values (?,?,?,?)");
         
         if(!$stmt2){
             echo json_encode(array(
@@ -35,7 +35,7 @@
             exit;
         }
         
-        $stmt2->bind_param('sss', $member, $content, $dt);
+        $stmt2->bind_param('ssss', $member, $content, $dt, $host);
         
         $stmt2->execute();
         
@@ -67,7 +67,7 @@
     $stmt3->store_result();
     if($stmt3->num_rows==0){
         $stmt3->close();
-        $stmt4 = $mysqli->prepare("insert into group_events (username, content, time) values (?,?,?)");
+        $stmt4 = $mysqli->prepare("insert into group_events (username, content, time, host) values (?,?,?,?)");
         if(!$stmt4){
             echo json_encode(array(
                 "success" => false,
@@ -76,7 +76,7 @@
             exit;
         }
         
-        $stmt4->bind_param('sss', $host, $content, $dt);
+        $stmt4->bind_param('ssss', $host, $content, $dt, $host);
         
         $stmt4->execute();
         
