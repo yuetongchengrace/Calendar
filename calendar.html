@@ -491,8 +491,6 @@
 						modify_button.setAttribute("id",id);
 						modify_button.innerHTML="modify";
 						modify_button.addEventListener("click",function(){
-							//console.log(this.id);
-							//check if another modify field already exists
 			
 							let regex=/\d+/;
 							function get_id(str){
@@ -674,17 +672,15 @@
 				//console.log(data.success ? "Succesfully display event" : `Display event failed ${data.message}`);
 				if(data.success==true){
 					for(i=0;i<data.event.length;i++){
-						//console.log(data.event);
 						let each_event=document.createElement("div");
 						let event_content=document.createElement("span");
 						event_content.innerHTML=data.event[i]+" ";
 						let dmTime=data.time[i];
-						//console.log(data.time[i]);
 
-						id="group_modify"+data.event_id[i];
-						id2="group_delete"+data.event_id[i];
-						//console.log(id);
-						//each_event.appendChild(event_tag);
+						let originalID=data.event_id[i];
+						let id="group_modify"+data.event_id[i];
+						let id2="group_delete"+data.event_id[i];
+						
 						each_event.appendChild(event_content);
 						let event_time=document.createElement("span");
 						let this_time=data.time[i].substring(11,16);
@@ -694,9 +690,6 @@
 						modify_button.setAttribute("id",id);
 						modify_button.innerHTML="modify";
 						modify_button.addEventListener("click",function(){
-							//console.log(this.id);
-							//check if another modify field already exists
-			
 							let regex=/\d+/;
 							function get_id(str){
 								if(match=regex.exec(str)){
@@ -755,7 +748,6 @@
 
 
 						});
-						each_event.appendChild(modify_button);
 
 						//click delete button will fetch delete.php which deletes event from the events table using event_id we passed in.
 						//Set id of this specific delete_button to be id2(aka "delete"+data.event_id[i] from earlier)
@@ -800,7 +792,29 @@
 							.catch(err => console.error(err));
 
 						});
-						each_event.appendChild(delete_button);
+
+						//check if the session user is the host, if not do not display button modify or delete
+						let id_data = {'id': originalID};
+						console.log(id_data);
+						fetch("checkHost.php",{
+							method: 'POST',
+							body: JSON.stringify(id_data),
+							headers: { 'content-type': 'application/json' 
+							//,'X-CSRF-Token': token 
+							}
+						})
+						.then(response => response.json())
+						.then(function(permission) {
+							console.log(JSON.stringify(permission.message));
+							if(permission.message == "permitted"){
+								each_event.appendChild(modify_button);
+								each_event.appendChild(delete_button);
+							}
+							else{}
+						})
+						.catch(err => console.error(err));
+							
+
 						document.getElementById("dialog_events").appendChild(each_event);
 					}
 
