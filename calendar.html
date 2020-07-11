@@ -15,11 +15,18 @@
 	<br>
 	<script>
 		let htmlButtonObj = document.getElementById("login_or_out");
+		let session_check;
 		fetch("checkUser.php")
 			.then(response => response.json())
 			.then(function(response) {
 				//console.log(JSON.stringify(response.message));
 				document.getElementById("login_or_out").textContent = response.message;
+				if(response.success==true){
+					session_check=true;
+				}
+				else{
+					session_check=false;
+				}
 			})
 			.catch(err => console.error(err));
 			
@@ -127,7 +134,20 @@
 				}
 				htmlDayObj.appendChild(each);
 				//call to function that displays event of that day
-				DisplayEventAjax(day,each);
+				let session_check="";
+					fetch("checkUser.php")
+						.then(response => response.json())
+						.then(function(response) {
+							//console.log(JSON.stringify(response.message));
+							if(response.success==true){
+								session_check="true";
+								DisplayEventAjax(day,each);
+							}
+							else{
+								session_check="false";
+							}
+						})
+						.catch(err => console.error(err));
 			}
 		}
 		// Change the month when the "last" button is pressed
@@ -200,7 +220,20 @@
 					}
 					htmlDayObj.appendChild(each);
 					//call to function that displays event of that day
-					DisplayEventAjax(day,each);
+					let session_check="";
+					fetch("checkUser.php")
+						.then(response => response.json())
+						.then(function(response) {
+							//console.log(JSON.stringify(response.message));
+							if(response.success==true){
+								session_check="true";
+								DisplayEventAjax(day,each);
+							}
+							else{
+								session_check="false";
+							}
+						})
+						.catch(err => console.error(err));
 				}
 			}
 		}
@@ -210,90 +243,90 @@
 			// Make a URL-encoded string for passing POST data:
 			//const data = { 'username': username, 'password': password };
 			const token= document.getElementsByName("token").value;
-			fetch("showevent.php", {
-				method: 'POST',
-				body: JSON.stringify(data),
-				headers: { 'content-type': 'application/json' 
-				//,'X-CSRF-Token': token 
-				}
-			})
-			.then(response => response.json())
-			.then(data => {
-				//console.log(data);
-				//console.log(data.success ? "Succesfully display event" : `Display event failed ${data.message}`);
-				if(data.success==true){
-					for(i=0;i<data.event.length;i++){
-						let work_check=document.getElementById("checkbox_work").checked;
-						let social_check=document.getElementById("checkbox_social").checked;
-						let other_check=document.getElementById("checkbox_other").checked;
-						let type=data.tag[i];
-						//don't do anything if this type of event is not supposed to be shown
-						if(type=="work"&&work_check!=true){
-						}
-						else if(type=="social"&&social_check!=true){
-						}
-						else if (type=="other"&&other_check!=true){
-						}
-						else{
-							type=data.tag[i];
-							let each_event=document.createElement("div");
-							let each_event_title=document.createElement("span");
-							each_event_title.innerHTML=data.event[i]+" ";
-							let each_event_time=document.createElement("span");
-							each_event_time.innerHTML=data.datetime[i].substring(11, 16);
-							each_event.appendChild(each_event_title);
-							each_event.appendChild(each_event_time);
-							each_event.classList="one_event";
-							each_event.classList+=" "+type;
-							each.appendChild(each_event);
-						}
-					}
-				}
-			})
-			.catch(err => console.error(err));
-
-			//show group events
-			fetch("showGroupEvent.php", {
+				fetch("showevent.php", {
 					method: 'POST',
 					body: JSON.stringify(data),
 					headers: { 'content-type': 'application/json' 
 					//,'X-CSRF-Token': token 
 					}
 				})
-			.then(response => response.json())
-			.then(data => {
-				console.log(data);
-				//console.log(data.success ? "Succesfully display event" : `Display event failed ${data.message}`);
-				if(data.success==true){
-					for(i=0;i<data.event.length;i++){
-						let work_check=document.getElementById("checkbox_work").checked;
-						let social_check=document.getElementById("checkbox_social").checked;
-						let other_check=document.getElementById("checkbox_other").checked;
-						let type=data.tag[i];
-						//don't do anything if this type of event is not supposed to be shown
-						if(type=="work"&&work_check!=true){
-						}
-						else if(type=="social"&&social_check!=true){
-						}
-						else if (type=="other"&&other_check!=true){
-						}
-						else{
-							type=data.tag[i];
-							let each_event=document.createElement("div");
-							let each_event_title=document.createElement("span");
-							each_event_title.innerHTML=data.event[i]+" ";
-							let each_event_time=document.createElement("span");
-							each_event_time.innerHTML=data.time[i].substring(11, 16);
-							each_event.appendChild(each_event_title);
-							each_event.appendChild(each_event_time);
-							each_event.classList="one_event";
-							each_event.classList+=" "+type;
-							each.appendChild(each_event);
+				.then(response => response.json())
+				.then(data => {
+					//console.log(data);
+					//console.log(data.success ? "Succesfully display event" : `Display event failed ${data.message}`);
+					if(data.success==true){
+						for(i=0;i<data.event.length;i++){
+							let work_check=document.getElementById("checkbox_work").checked;
+							let social_check=document.getElementById("checkbox_social").checked;
+							let other_check=document.getElementById("checkbox_other").checked;
+							let type=data.tag[i];
+							//don't do anything if this type of event is not supposed to be shown
+							if(type=="work"&&work_check!=true){
+							}
+							else if(type=="social"&&social_check!=true){
+							}
+							else if (type=="other"&&other_check!=true){
+							}
+							else{
+								type=data.tag[i];
+								let each_event=document.createElement("div");
+								let each_event_title=document.createElement("span");
+								each_event_title.innerHTML=data.event[i]+" ";
+								let each_event_time=document.createElement("span");
+								each_event_time.innerHTML=data.datetime[i].substring(11, 16);
+								each_event.appendChild(each_event_title);
+								each_event.appendChild(each_event_time);
+								each_event.classList="one_event";
+								each_event.classList+=" "+type;
+								each.appendChild(each_event);
+							}
 						}
 					}
-				}
-			})
-			.catch(err => console.error(err));
+				})
+				.catch(err => console.error(err));
+
+				//show group events
+				fetch("showGroupEvent.php", {
+						method: 'POST',
+						body: JSON.stringify(data),
+						headers: { 'content-type': 'application/json' 
+						//,'X-CSRF-Token': token 
+						}
+					})
+				.then(response => response.json())
+				.then(data => {
+					//console.log(data);
+					//console.log(data.success ? "Succesfully display event" : `Display event failed ${data.message}`);
+					if(data.success==true){
+						for(i=0;i<data.event.length;i++){
+							let work_check=document.getElementById("checkbox_work").checked;
+							let social_check=document.getElementById("checkbox_social").checked;
+							let other_check=document.getElementById("checkbox_other").checked;
+							let type=data.tag[i];
+							//don't do anything if this type of event is not supposed to be shown
+							if(type=="work"&&work_check!=true){
+							}
+							else if(type=="social"&&social_check!=true){
+							}
+							else if (type=="other"&&other_check!=true){
+							}
+							else{
+								type=data.tag[i];
+								let each_event=document.createElement("div");
+								let each_event_title=document.createElement("span");
+								each_event_title.innerHTML=data.event[i]+" ";
+								let each_event_time=document.createElement("span");
+								each_event_time.innerHTML=data.time[i].substring(11, 16);
+								each_event.appendChild(each_event_title);
+								each_event.appendChild(each_event_time);
+								each_event.classList="one_event";
+								each_event.classList+=" "+type;
+								each.appendChild(each_event);
+							}
+						}
+					}
+				})
+				.catch(err => console.error(err));
 			
 		}
 
@@ -338,6 +371,7 @@
 			<button id="add_another_user">+</button><br>
 		</form>
 		<button id="confirm_group">Confirm</button>
+		<button id="cancel_group">Cancel</button>
 	</div>
 
 	<script>
@@ -347,11 +381,18 @@
 			event.preventDefault();
 			let this_member = document.createElement("input");
 			this_member.setAttribute("type", "text");
+			this_member.setAttribute("class", "group_input");
 			group_count += 1;
 			let this_member_id = "group_member"+String(group_count);
 			this_member.setAttribute("id", this_member_id);
 			//this_member.textContent = 
 			document.getElementById("group_form").appendChild(this_member);
+		})
+
+		document.getElementById("cancel_group").addEventListener("click", function(event){
+			event.preventDefault();
+			$("#group_popup").hide(400);
+			updateCalendar();
 		})
 
 		//add group event button listener
@@ -364,59 +405,96 @@
 			let time = document.getElementById("time").value;
 			let dt = String(sqlDate+time+":00.000Z");
 			let content = document.getElementById("event_content").value;
-
+			
 			if(content!=""){
 				$("#myform").hide(400);
 				$("#group_popup").show(400);
-				document.getElementById("confirm_group").addEventListener("click", function(event2){
-					event2.preventDefault();
+				group_count = 1;
+				document.getElementById("group_member1").value = "";	
+			}
+		}, false)
+		document.getElementById("confirm_group").addEventListener("click", function(event2){
+					//console.log(content);
 					$("#group_popup").hide(400);
+					const id = document.getElementById("dateId").value;
+					const idRegex = /\d{4}-\d{2}-\d{2}\w/g;
+					let sqlDate = id.match(idRegex);
+					let time = document.getElementById("time").value;
+					let dt = String(sqlDate+time+":00.000Z");
+					event2.preventDefault();
 					//add to group_events
 					for(let i=1; i<=group_count; i++){
+						//console.log(group_count);
+						//console.log(i);
 						let member_id="group_member"+String(i);
 						if(document.getElementById(member_id).value!=""){
-							const id = document.getElementById("dateId").value;
-							let date = document.getElementById(id);
+							// const id = document.getElementById("dateId").value;
+							// let date = document.getElementById(id);
+							let content = document.getElementById("event_content").value;
 							let selected=document.getElementById("tag_value").value;
 							let group_member = document.getElementById(member_id).value;
-							let work_check=document.getElementById("checkbox_work").checked;
-							let social_check=document.getElementById("checkbox_social").checked;
-							let other_check=document.getElementById("checkbox_other").checked;
-							//don't do anything if this type of event is not supposed to be shown
-							if(selected=="work"&&work_check!=true){
-							}
-							else if(selected=="social"&&social_check!=true){
-							}
-							else if (selected=="other"&&other_check!=true){
-							}
-							else{
-								let each = document.createElement("div");
-								let each_event_title=document.createElement("span");
-								each_event_title.innerHTML=content+" ";
-								let each_event_time=document.createElement("span");
-								each_event_time.innerHTML=document.getElementById("time").value;
-								each.appendChild(each_event_title);
-								each.appendChild(each_event_time);
-								each.classList="one_event";
-								each.classList+=" "+selected;
-								date.appendChild(each);
+							// let work_check=document.getElementById("checkbox_work").checked;
+							// let social_check=document.getElementById("checkbox_social").checked;
+							// let other_check=document.getElementById("checkbox_other").checked;
+							// //don't do anything if this type of event is not supposed to be shown
+							// if(selected=="work"&&work_check!=true){
+							// }
+							// else if(selected=="social"&&social_check!=true){
+							// }
+							// else if (selected=="other"&&other_check!=true){
+							// }
+							// else{
+							// 	let each = document.createElement("div");
+							// 	let each_event_title=document.createElement("span");
+							// 	each_event_title.innerHTML=content+" ";
+							// 	let each_event_time=document.createElement("span");
+							// 	each_event_time.innerHTML=document.getElementById("time").value;
+							// 	each.appendChild(each_event_title);
+							// 	each.appendChild(each_event_time);
+							// 	each.classList="one_event";
+							// 	each.classList+=" "+selected;
+							// 	date.appendChild(each);
 								
-							}
+							// }
 							const data = {'content': content, 'datetime': dt, 'username': group_member, 'tag': selected};
+							//console.log(data);
 							fetch('addGroupEvent.php', {
 								method: "POST",
-								body: JSON.stringify(data)
+								body: JSON.stringify(data),
+								headers: { 'content-type': 'application/json' 
+								//,'X-CSRF-Token': token 
+								}
 							})
-							.then(console.log(data))
-							.catch(error => console.error(error));
+							.then(response => response.json())
+							.then(data => {
+								if(data.success==false){
+									alert(data.message);
+								}
+								else{
+									alert (data.message_member);
+									alert(data.message);
+									updateCalendar();
+								}
+								
+							})
+							//.then(function(stuff){console.log(stuff);})
+							//.catch(error => console.error(error));
+							// .then(response => response.json())
+							// .then(function(stuff){
+							// 	console.log(stuff);
+							// 	alert(stuff);
+							// }).catch(error => console.error(error));
 						}
 						else{/*do nothing if there's no username input*/}
 					}
-					event2.preventDefault();
-					//$("#myform").show(400);
+					let remove = document.getElementsByClassName("group_input");
+					let parent = document.getElementById("group_form");
+					for(let r=0;r<remove.length;r++){
+						parent.removeChild(remove[r]);
+					}
+					
+					document.getElementById("event_content").value = "";
 				}, false)
-			}
-		}, false)
 
 
 		//change background color of select drop down based on what is selected
@@ -682,7 +760,9 @@
 												method: "POST",
 												body: JSON.stringify(data)
 											})
-											.then(console.log(data))
+											.then(data => {
+												alert(data.message);
+											})
 											.catch(error => console.error(error));
 										}
 										else{/*do nothing if there's no username input*/}
@@ -721,6 +801,7 @@
 						event_tag.classList=tag_type+"dot";
 						event_content.innerHTML=data.event[i]+" ";
 						let dmTime=data.time[i];
+						let this_host=data.host[i];
 
 						let originalID=data.event_id[i];
 						let id="group_modify"+data.event_id[i];
@@ -731,7 +812,11 @@
 						let event_time=document.createElement("span");
 						let this_time=data.time[i].substring(11,16);
 						event_time.innerHTML=data.time[i].substring(11,16)+" ";
+						let event_host=document.createElement("span");
+						event_host.innerHTML=" "+"Host: "+this_host;
+						event_host.setAttribute("class","host_who");
 						each_event.appendChild(event_time);
+						each_event.appendChild(event_host);
 						let modify_button=document.createElement("button");
 						modify_button.setAttribute("id",id);
 						modify_button.innerHTML="modify";
