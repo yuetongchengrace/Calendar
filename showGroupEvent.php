@@ -15,7 +15,7 @@
     }
     $day_left=substr($day, 0, 10);
     require 'database.php';
-    $stmt = $mysqli->prepare("select content, event_id, time from group_events where LEFT(time, 10)='$day_left' AND username='$username'");
+    $stmt = $mysqli->prepare("select content, event_id, time, tag from group_events where LEFT(time, 10)='$day_left' AND username='$username'");
     if(!$stmt){
         echo json_encode(array(
             "success" => false,
@@ -24,20 +24,23 @@
         exit;
     }
     $stmt->execute();
-    $stmt->bind_result($event,$event_id,$time);
+    $stmt->bind_result($event,$event_id,$time,$tag);
     $array=array();
     $array2=array();
     $array3=array();
+    $array4=array();
     while($stmt->fetch()){
         array_push($array,$event);
         array_push($array2,$event_id);
         array_push($array3,$time);
+        array_push($array4,$tag);
     }
     if(count($array)>=1){
         echo json_encode(array(
             "event" => $array,
             "event_id" => $array2,
             "time"=>$array3,
+            "tag"=>$array4,
             "success" => true,
             "message" => "succesfully get event from sql database"
         ));	

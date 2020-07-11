@@ -266,15 +266,30 @@
 				//console.log(data.success ? "Succesfully display event" : `Display event failed ${data.message}`);
 				if(data.success==true){
 					for(i=0;i<data.event.length;i++){
-						let each_event=document.createElement("div");
-						let each_event_title=document.createElement("span");
-						each_event_title.innerHTML=data.event[i]+" ";
-						let each_event_time=document.createElement("span");
-						each_event_time.innerHTML=data.time[i].substring(11, 16);
-						each_event.appendChild(each_event_title);
-						each_event.appendChild(each_event_time);
-						each_event.classList="one_event";
-						each.appendChild(each_event);
+						let work_check=document.getElementById("checkbox_work").checked;
+						let social_check=document.getElementById("checkbox_social").checked;
+						let other_check=document.getElementById("checkbox_other").checked;
+						let type=data.tag[i];
+						//don't do anything if this type of event is not supposed to be shown
+						if(type=="work"&&work_check!=true){
+						}
+						else if(type=="social"&&social_check!=true){
+						}
+						else if (type=="other"&&other_check!=true){
+						}
+						else{
+							type=data.tag[i];
+							let each_event=document.createElement("div");
+							let each_event_title=document.createElement("span");
+							each_event_title.innerHTML=data.event[i]+" ";
+							let each_event_time=document.createElement("span");
+							each_event_time.innerHTML=data.time[i].substring(11, 16);
+							each_event.appendChild(each_event_title);
+							each_event.appendChild(each_event_time);
+							each_event.classList="one_event";
+							each_event.classList+=" "+type;
+							each.appendChild(each_event);
+						}
 					}
 				}
 			})
@@ -355,12 +370,39 @@
 				$("#group_popup").show(400);
 				document.getElementById("confirm_group").addEventListener("click", function(event2){
 					event2.preventDefault();
+					$("#group_popup").hide(400);
 					//add to group_events
 					for(let i=1; i<=group_count; i++){
 						let member_id="group_member"+String(i);
 						if(document.getElementById(member_id).value!=""){
+							const id = document.getElementById("dateId").value;
+							let date = document.getElementById(id);
+							let selected=document.getElementById("tag_value").value;
 							let group_member = document.getElementById(member_id).value;
-							const data = {'content': content, 'datetime': dt, 'username': group_member};
+							let work_check=document.getElementById("checkbox_work").checked;
+							let social_check=document.getElementById("checkbox_social").checked;
+							let other_check=document.getElementById("checkbox_other").checked;
+							//don't do anything if this type of event is not supposed to be shown
+							if(selected=="work"&&work_check!=true){
+							}
+							else if(selected=="social"&&social_check!=true){
+							}
+							else if (selected=="other"&&other_check!=true){
+							}
+							else{
+								let each = document.createElement("div");
+								let each_event_title=document.createElement("span");
+								each_event_title.innerHTML=content+" ";
+								let each_event_time=document.createElement("span");
+								each_event_time.innerHTML=document.getElementById("time").value;
+								each.appendChild(each_event_title);
+								each.appendChild(each_event_time);
+								each.classList="one_event";
+								each.classList+=" "+selected;
+								date.appendChild(each);
+								
+							}
+							const data = {'content': content, 'datetime': dt, 'username': group_member, 'tag': selected};
 							fetch('addGroupEvent.php', {
 								method: "POST",
 								body: JSON.stringify(data)
@@ -371,8 +413,7 @@
 						else{/*do nothing if there's no username input*/}
 					}
 					event2.preventDefault();
-					$("#group_popup").hide(400);
-					$("#myform").show(400);
+					//$("#myform").show(400);
 				}, false)
 			}
 		}, false)
@@ -468,7 +509,7 @@
 						let event_tag=document.createElement("span");
 						let tag_type=data.tag[i];
 						event_tag.classList=tag_type+"dot";
-						//console.log(event_tag);
+						console.log(tag_type);
 						let event_content=document.createElement("span");
 						event_content.innerHTML=data.event[i]+" ";
 						let content_html=data.event[i];
@@ -636,7 +677,7 @@
 										let member_id="group_member"+String(i);
 										if(document.getElementById(member_id).value!=""){
 											let group_member = document.getElementById(member_id).value;
-											const data = {'content': content, 'datetime': dt, 'username': group_member};
+											const data = {'content': content, 'datetime': dt, 'username': group_member, 'tag': tag_type};
 											fetch('addGroupEvent.php', {
 												method: "POST",
 												body: JSON.stringify(data)
@@ -674,6 +715,10 @@
 					for(i=0;i<data.event.length;i++){
 						let each_event=document.createElement("div");
 						let event_content=document.createElement("span");
+						let event_tag=document.createElement("span");
+						let tag_type=data.tag[i];
+						console.log(tag_type);
+						event_tag.classList=tag_type+"dot";
 						event_content.innerHTML=data.event[i]+" ";
 						let dmTime=data.time[i];
 
@@ -681,6 +726,7 @@
 						let id="group_modify"+data.event_id[i];
 						let id2="group_delete"+data.event_id[i];
 						
+						each_event.appendChild(event_tag);
 						each_event.appendChild(event_content);
 						let event_time=document.createElement("span");
 						let this_time=data.time[i].substring(11,16);
@@ -813,8 +859,6 @@
 							else{}
 						})
 						.catch(err => console.error(err));
-							
-
 						document.getElementById("dialog_events").appendChild(each_event);
 					}
 
