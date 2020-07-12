@@ -6,9 +6,9 @@
     font-size:25px;
     font-weight: bold;
 }
-#back_to_current_month{
+#header_float_right{
     float:right;
-    margin-right:30px;
+    margin-right:20px;
 }
 table, th, td {  
     border: 1px solid black;

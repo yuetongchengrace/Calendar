@@ -4,13 +4,18 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" type="text/css" href="calendar.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<title>Calendar</title>
 </head>
 <body>
-	<button type="button" id="previous_month_btn">Last Month</button>
-	<button type="button" id="next_month_btn">Next Month</button>
-	<a href="logout.php" id="login_or_out" ></a>
+	<button type="button" id="previous_month_btn"><i class="fa fa-chevron-left"></i></button>
+	<button type="button" id="next_month_btn"><i class="fa fa-chevron-right"></i></button>
+	<div id="header_float_right">
+		<div id="logged_in_user"></div> 
+		<div><a href="logout.php" id="login_or_out" ></a></div>
+	</div>
+	
 	<button type="button" id="back_to_current_month">Back to current month</button>
 	<br>
 	<script>
@@ -22,9 +27,11 @@
 				//console.log(JSON.stringify(response.message));
 				document.getElementById("login_or_out").textContent = response.message;
 				if(response.success==true){
+					document.getElementById("logged_in_user").textContent="User: "+response.username;
 					session_check=true;
 				}
 				else{
+					document.getElementById("logged_in_user").textContent="Visitor";
 					session_check=false;
 				}
 			})
@@ -91,8 +98,9 @@
 		//get today's date
 		let d=new Date();
 		let mm=d.getMonth();
+		let yy=d.getFullYear();
 		let dd = String(d.getDate()).padStart(2, '0');
-		let currentMonth = new Month(2020, mm); 
+		let currentMonth = new Month(yy, mm); 
 		let htmlMonthObj = document.getElementsByClassName("current_month")[0];
 		htmlMonthObj.textContent += currentMonth.year+'.'+parseInt(currentMonth.month+1);
 		let weeks = currentMonth.getWeeks();
@@ -117,14 +125,6 @@
 				}
 				let div_arr=document.getElementsByClassName("td_div");
 				//jquery for displaying pop up and event inside
-				$(each).click(function(){
-					$("#event_content").val("");
-					id=$(this).attr("id");
-					$("#myform").show(500);
-					$('#dateId').val(id);
-					displayEventByDay(id);
-					$("#time").val("");
-				});
 				let text=document.createElement("div");
 				text.innerHTML=match;
 				text.classList="date_num";
@@ -140,6 +140,14 @@
 						.then(function(response) {
 							//console.log(JSON.stringify(response.message));
 							if(response.success==true){
+								$(each).click(function(){
+								$("#event_content").val("");
+								id=$(this).attr("id");
+								$("#myform").show(500);
+								$('#dateId').val(id);
+								displayEventByDay(id);
+								$("#time").val("");
+							});
 								session_check="true";
 								DisplayEventAjax(day,each);
 							}
@@ -165,77 +173,108 @@
 		}, false);
 		document.getElementById("back_to_current_month").addEventListener("click",function(event){
 			let mm=d.getMonth();
-			let current = new Month(2020, mm); 
+			let yy=d.getFullYear();
+			let current = new Month(yy, mm); 
 			currentMonth=current;
 			updateCalendar();
 		},false);
 		//update calendar (used when user clicked to another month)
 		function updateCalendar(){
-			let htmlTableObj = document.getElementById("calendar_table");
-			htmlTableObj.innerHTML = "";
-			let htmlCaptionObj = htmlTableObj.appendChild(document.createElement("caption"));
-			let htmlWeekObj = htmlTableObj.appendChild(document.createElement("tr"));
-			htmlCaptionObj.appendChild(document.createTextNode("Current Month: "));
-			htmlCaptionObj.textContent += currentMonth.year+'.'+parseInt(currentMonth.month+1);
-			htmlCaptionObj.className="current_month";
-			for(let i=0; i<7; i++){
-				let htmlDayObj = htmlWeekObj.appendChild(document.createElement("th"));
-				let weekDays = ['Sunday', 'Monday','Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-				htmlDayObj.appendChild(document.createTextNode(weekDays[i]));
+			//console.log(currentMonth);
+			let data;
+			if(currentMonth.month<=8){
+				data = {'current_month': (String)(currentMonth.year)+"-0"+(String)(currentMonth.month+1)};
 			}
-
-			let weeks = currentMonth.getWeeks();
-			let dayRegex = /\d{2}/g;
-
-			for(let w in weeks){
-				let htmlWeekObj = htmlTableObj.appendChild(document.createElement("tr"));
-				let days = weeks[w].getDates();
-
-				for(let d in days){
-					let htmlDayObj = htmlWeekObj.appendChild(document.createElement("td"));
-					let day = days[d].toISOString();
-					let match_month=day.match(dayRegex)[2];
-					let match = day.match(dayRegex)[3];
-					let each= document.createElement("div");
-					each.classList.add("td_div");
-					each.id=day;
-					if(match_month!=currentMonth.month+1){
-						each.classList.add("not_this_month");
-					}
-					$(each).click(function(){
-						$("#event_content").val("");
-						id=$(this).attr("id");
-						$("#myform input[type=text]").val('');
-						$("#myform").show(500);
-						$('#dateId').val(id);
-						displayEventByDay(id);
-						$("#time").val("");
-					});
-					let text=document.createElement("div");
-					text.innerHTML=match;
-					text.classList="date_num";
-					each.appendChild(text);
-					if(dd==match&&mm+1==match_month){
-						each.firstChild.classList.add("today");
-					}
-					htmlDayObj.appendChild(each);
-					//call to function that displays event of that day
-					let session_check="";
-					fetch("checkUser.php")
-						.then(response => response.json())
-						.then(function(response) {
-							//console.log(JSON.stringify(response.message));
-							if(response.success==true){
-								session_check="true";
-								DisplayEventAjax(day,each);
-							}
-							else{
-								session_check="false";
-							}
-						})
-						.catch(err => console.error(err));
-				}
+			else{
+				data = {'current_month': (String)(currentMonth.year)+"-"+(String)(currentMonth.month+1)};
 			}
+			//console.log(data);
+			//const token= document.getElementsByName("token").value;
+				fetch("checkmonth.php", {
+					method: 'POST',
+					body: JSON.stringify(data),
+					headers: { 'content-type': 'application/json' 
+					//,'X-CSRF-Token': token 
+					}
+				})
+				.then(response => response.json())
+				.then(data => {
+						//console.log(data.success);
+						let display=data.success;
+						let htmlTableObj = document.getElementById("calendar_table");
+						htmlTableObj.innerHTML = "";
+						let htmlCaptionObj = htmlTableObj.appendChild(document.createElement("caption"));
+						let htmlWeekObj = htmlTableObj.appendChild(document.createElement("tr"));
+						htmlCaptionObj.appendChild(document.createTextNode("Current Month: "));
+						htmlCaptionObj.textContent += currentMonth.year+'.'+parseInt(currentMonth.month+1);
+						htmlCaptionObj.className="current_month";
+						for(let i=0; i<7; i++){
+							let htmlDayObj = htmlWeekObj.appendChild(document.createElement("th"));
+							let weekDays = ['Sunday', 'Monday','Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+							htmlDayObj.appendChild(document.createTextNode(weekDays[i]));
+						}
+
+						let weeks = currentMonth.getWeeks();
+						let dayRegex = /\d{2}/g;
+
+						for(let w in weeks){
+							let htmlWeekObj = htmlTableObj.appendChild(document.createElement("tr"));
+							let days = weeks[w].getDates();
+
+							for(let d in days){
+								let htmlDayObj = htmlWeekObj.appendChild(document.createElement("td"));
+								let day = days[d].toISOString();
+								let match_year=day.match(dayRegex)[0]+day.match(dayRegex)[1];
+								//console.log(match_year);
+								let match_month=day.match(dayRegex)[2];
+								let match = day.match(dayRegex)[3];
+								let each= document.createElement("div");
+								each.classList.add("td_div");
+								each.id=day;
+								if(match_month!=currentMonth.month+1){
+									each.classList.add("not_this_month");
+								}
+								$(each).click(function(){
+									$("#event_content").val("");
+									id=$(this).attr("id");
+									$("#myform input[type=text]").val('');
+									$("#myform").show(500);
+									$('#dateId').val(id);
+									displayEventByDay(id);
+									$("#time").val("");
+								});
+								let text=document.createElement("div");
+								text.innerHTML=match;
+								text.classList="date_num";
+								each.appendChild(text);
+								if(dd==match&&mm+1==match_month&&yy==match_year){
+									each.firstChild.classList.add("today");
+								}
+								htmlDayObj.appendChild(each);
+								//call to function that displays event of that day
+								// let session_check="";
+								// fetch("checkUser.php")
+								// 	.then(response => response.json())
+								// 	.then(function(response) {
+								// 		//console.log(JSON.stringify(response.message));
+								// 		if(response.success==true){
+								// 			session_check="true";
+								if(display==true&&data.user!="visitor"){
+									DisplayEventAjax(day,each);
+									console.log("getting this month");
+								}
+								//console.log(data.user);
+									// 	}
+									// 	else{
+									// 		session_check="false";
+									// 	}
+									// })
+									// .catch(err => console.error(err));
+							}
+						}
+					
+				})
+				.catch(err => console.error(err));
 		}
 		//display all events of that day in the corresponding div
 		function DisplayEventAjax(day,each) {

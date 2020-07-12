@@ -3,7 +3,8 @@
     if (isset($_SESSION['username'])) {
         echo json_encode(array(
             "success" => true,
-            "message" => "logout"
+            "message" => "logout",
+            "username" => $_SESSION['username']
         ));
     }
     else{
