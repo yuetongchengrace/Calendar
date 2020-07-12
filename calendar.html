@@ -5,20 +5,25 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" type="text/css" href="calendar.css" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@700&family=Catamaran:wght@500&family=Nunito:wght@300&display=swap" rel="stylesheet">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<title>Calendar</title>
 </head>
 <body>
-	<button type="button" id="previous_month_btn"><i class="fa fa-chevron-left"></i></button>
-	<button type="button" id="next_month_btn"><i class="fa fa-chevron-right"></i></button>
-	<div id="header_float_right">
-		<div id="logged_in_user"></div> 
-		<div><a href="logout.php" id="login_or_out" ></a></div>
+	<div id="buttons">
+		<button type="button" id="previous_month_btn"><i class="fa fa-chevron-left"></i></button>
+		<button type="button" id="back_to_current_month">Back to current month</button>
+		<button type="button" id="next_month_btn"><i class="fa fa-chevron-right"></i></button>
 	</div>
-	
-	<button type="button" id="back_to_current_month">Back to current month</button>
+	<div id="header_float_right">
+		<span id="logged_in_user"></span> 
+		<span><button type="button" id="login_or_out" ></button></span>
+	</div>
 	<br>
 	<script>
+		document.getElementById("login_or_out").addEventListener("click",function(){
+			window.location.href="logout.php";
+		});
 		let htmlButtonObj = document.getElementById("login_or_out");
 		let session_check;
 		fetch("checkUser.php")
@@ -39,7 +44,7 @@
 			
 	</script>
 	<table id="calendar_table">
-		<caption class="current_month">Current Month: </caption>
+		<caption class="current_month">Month: </caption>
 		<tr>
 		  <th>Sunday</th>
 		  <th>Monday</th>
@@ -51,13 +56,14 @@
 		</tr>
 		
 	</table>
-	<input type="checkbox" id="checkbox_work" name="show_work" value="work">
-	<label for="checkbox_work">work</label>
-	<input type="checkbox" id="checkbox_social" name="show_social" value="work">
-	<label for="checkbox_social">social</label>
-	<input type="checkbox" id="checkbox_other" name="show_other" value="other">
-	<label for="checkbox_other">other</label>
-
+	<div id="type_checkboxs">
+		<input type="checkbox" id="checkbox_work" name="show_work" value="work">
+		<label for="checkbox_work">work</label>
+		<input type="checkbox" id="checkbox_social" name="show_social" value="work">
+		<label for="checkbox_social">social</label>
+		<input type="checkbox" id="checkbox_other" name="show_other" value="other">
+		<label for="checkbox_other">other</label>
+	</div>
 	<script>
 		//check all the checkbox by default
 		$('#checkbox_work').attr('checked', true);
@@ -205,7 +211,7 @@
 						htmlTableObj.innerHTML = "";
 						let htmlCaptionObj = htmlTableObj.appendChild(document.createElement("caption"));
 						let htmlWeekObj = htmlTableObj.appendChild(document.createElement("tr"));
-						htmlCaptionObj.appendChild(document.createTextNode("Current Month: "));
+						htmlCaptionObj.appendChild(document.createTextNode("Month: "));
 						htmlCaptionObj.textContent += currentMonth.year+'.'+parseInt(currentMonth.month+1);
 						htmlCaptionObj.className="current_month";
 						for(let i=0; i<7; i++){
@@ -397,9 +403,9 @@
 				<div id="format">Please write in the format: HH:MM</div>
 			</div>
 			<input type="hidden" id="dateId" value="">
-			<button id="add">Add</button>
-			<button id="add_group">Add group event</button>
-			<button id="cancel_add">X</button>
+			<button class="dialog_buttons" id="add">Add</button>
+			<button class="dialog_buttons" id="add_group">Add group event</button>
+			<button class="dialog_buttons" id="cancel_add">X</button>
 		</form>
 	</div>
 
@@ -418,14 +424,16 @@
 		let group_count = 1;
 		document.getElementById("add_another_user").addEventListener("click", function(event){
 			event.preventDefault();
+			let div=document.createElement("div");
 			let this_member = document.createElement("input");
 			this_member.setAttribute("type", "text");
-			this_member.setAttribute("class", "group_input");
+			div.setAttribute("class", "group_input");
 			group_count += 1;
 			let this_member_id = "group_member"+String(group_count);
 			this_member.setAttribute("id", this_member_id);
+			div.appendChild(this_member);
 			//this_member.textContent = 
-			document.getElementById("group_form").appendChild(this_member);
+			document.getElementById("group_form").appendChild(div);
 		})
 
 		document.getElementById("cancel_group").addEventListener("click", function(event){
@@ -507,6 +515,9 @@
 							.then(response => response.json())
 							.then(data => {
 								if(data.success==false){
+									if(data.message_member){
+										alert (data.message_member);
+									}
 									alert(data.message);
 								}
 								else{
@@ -836,7 +847,7 @@
 						let event_content=document.createElement("span");
 						let event_tag=document.createElement("span");
 						let tag_type=data.tag[i];
-						console.log(tag_type);
+						//console.log(tag_type);
 						event_tag.classList=tag_type+"dot";
 						event_content.innerHTML=data.event[i]+" ";
 						let dmTime=data.time[i];
@@ -965,7 +976,7 @@
 
 						//check if the session user is the host, if not do not display button modify or delete
 						let id_data = {'id': originalID};
-						console.log(id_data);
+						//console.log(id_data);
 						fetch("checkHost.php",{
 							method: 'POST',
 							body: JSON.stringify(id_data),

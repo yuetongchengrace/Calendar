@@ -1,21 +1,75 @@
+body{
+    text-align:center;
+}
+#login_title{
+    margin-top:300px;
+}
+
+#buttons button{
+    padding:5px;
+    border-radius:5%;
+    font-size:15px;
+    background-color:rgb(120, 92, 96);
+    color:#fafafa;
+}
+#buttons button:hover{
+    background-color:rgb(240, 231, 224);
+    color:grey;
+}
+.dialog_buttons{
+    padding:5px;
+    border-radius:5%;
+    font-size:15px;
+    background-color:rgb(120, 92, 96);
+    color:#fafafa;
+}
+.dialog_buttons:hover{
+    background-color:rgb(240, 231, 224);
+    color:grey;
+}
 #calendar_table {
     text-align: center;
     width: 100%;
 }
 .current_month{
-    font-size:25px;
-    font-weight: bold;
+    font-size:33px;
+    margin-bottom:10px;
+    font-family: 'Catamaran', sans-serif;
+}
+#buttons{
+    float:left;
 }
 #header_float_right{
     float:right;
-    margin-right:20px;
+    margin-right:10px;
 }
+#logged_in_user{
+    font-family: 'Catamaran', sans-serif;
+    font-size:25px;
+}
+#login_or_out{
+    margin-left:5px;
+    border-radius:5%;
+    font-size:15px;
+    color:white;
+    background-color:rgb(120, 92, 96);
+}
+#login_or_out:hover{
+    background-color:rgb(240, 231, 224);
+    color:grey;
+}
+
+
 table, th, td {  
     border: 1px solid black;
     border-collapse: collapse;
     background-color: seashell;
 }
-
+th{
+    font-family: 'Arimo', sans-serif;
+    padding-top:10px;
+    padding-bottom:10px;
+}
 td{
     width: 14.2%;
 }
@@ -26,12 +80,14 @@ td{
     text-align:left;
     overflow: scroll;
     text-overflow: ellipsis;
+    font-family: 'Nunito', sans-serif;
 }
 
 .td_div:hover{
     background-color:rgb(240, 231, 224);
 }
 .dialog{
+    font-family: 'Nunito', sans-serif;
     padding:30px;
     background:white;
     border:1px solid black;
@@ -46,7 +102,7 @@ td{
 
 #events{
     text-align:left;
-    padding-left:30px;
+    padding-left:10px;
     margin-bottom:50px;
 }
 .date_num{
@@ -54,10 +110,12 @@ td{
 }
 .one_event{
     line-height:25px;
+    margin-bottom:10px;
 }
 #dialog_events{
     margin-top:30px;
     padding-left:80px;
+    line-height:35px;
 }
 .not_this_month{
     background-color:rgb(198, 196, 196);
@@ -69,15 +127,22 @@ textarea{
     height:50px;
 }
 
+#type_checkboxs{
+    margin-top:10px;
+    font-size:20px;
+}
 .work{
+    border:0.1px solid white;
     background-color: hotpink;
 }
 
 .social{
+    border:0.1px solid white;
     background-color: #ffe08a;
 }
 
 .other{
+    border:0.1px solid white;
     background-color:turquoise;
 }
 
@@ -140,5 +205,6 @@ textarea{
 }
 
 .host_who{
-    margin-left:5px;
+    margin-left:4px;
+    margin-right:8px;
 }

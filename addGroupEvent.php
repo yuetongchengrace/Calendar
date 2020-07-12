@@ -9,7 +9,13 @@
     $member = $json_obj['username'];
     $host = $_SESSION['username'];
     $tag = $json_obj['tag'];
-
+    if($host=$member){
+        echo json_encode(array(
+            "success" => false,
+            "message" => "You cannot add yourself as a group event member!"
+        ));	
+        exit;
+    }
     require 'database.php';
 
     //odd statements are for checking existence for group event
@@ -126,7 +132,8 @@
         $stmt3->close();
         echo json_encode(array(
             "success" => false,
-            "message" => "host already exists"
+            "message" => "host already exists",
+            "message_member" => $message_member
         ));	
     }
     exit;
