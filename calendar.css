@@ -1,10 +1,16 @@
 body{
     text-align:center;
 }
+
 #login_title{
     margin-top:300px;
+    font-family: 'Catamaran', sans-serif;
+    font-size:30px;
+    margin-bottom:50px;
 }
-
+#login_information{
+    margin-bottom:30px;
+}
 #buttons button{
     padding:5px;
     border-radius:5%;

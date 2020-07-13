@@ -9,7 +9,7 @@
     $member = $json_obj['username'];
     $host = $_SESSION['username'];
     $tag = $json_obj['tag'];
-    if($host=$member){
+    if($host==$member){
         echo json_encode(array(
             "success" => false,
             "message" => "You cannot add yourself as a group event member!"
