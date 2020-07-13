@@ -33,6 +33,12 @@ body{
     background-color:rgb(240, 231, 224);
     color:grey;
 }
+.modify_buttons{
+    margin-left:5px;
+}
+.delete_buttons{
+    margin-left:10px;
+}
 #calendar_table {
     text-align: center;
     width: 100%;
@@ -213,4 +219,9 @@ textarea{
 .host_who{
     margin-left:4px;
     margin-right:8px;
+    font-weight:bold;
+}
+
+.groupevent_members{
+    font-weight:bold;
 }

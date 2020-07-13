@@ -26,7 +26,8 @@
     if($host == $user){
         echo json_encode(array(
             "success" => true,
-            "message" => "permitted"
+            "message" => "permitted",
+            "host" => $host
         ));
     }
     else{

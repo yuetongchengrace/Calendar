@@ -709,6 +709,7 @@
 						each_event.appendChild(event_time);
 						let modify_button=document.createElement("button");
 						modify_button.setAttribute("id",id);
+						modify_button.setAttribute("class","modify_buttons");
 						modify_button.innerHTML="modify";
 						modify_button.addEventListener("click",function(){
 			
@@ -780,6 +781,7 @@
 						//fetch "delete".php wil delete event with this specific id (auto_increment) so it is unique.
 						let delete_button=document.createElement("button");
 						delete_button.setAttribute("id",id2);
+						delete_button.setAttribute("class","delete_buttons");
 						delete_button.innerHTML="delete";
 						//
 						delete_button.addEventListener("click",function(){
@@ -817,65 +819,65 @@
 						});
 						each_event.appendChild(delete_button);
 
-						let group_button = document.createElement("button");
-						group_button.setAttribute("id", id3);
-						group_button.innerHTML = "Add group event";
-						//add group event button listener in pop up window
-						group_button.addEventListener("click", function(){
-							event.preventDefault();
-							//get time and event content
-							const id = document.getElementById("dateId").value;
-							const idRegex = /\d{4}-\d{2}-\d{2}\w/g;
-							let sqlDate = id.match(idRegex);
-							let dt = String(sqlDate+this_time+":00.000Z");
-							let content = event_content.innerHTML;
+						// let group_button = document.createElement("button");
+						// group_button.setAttribute("id", id3);
+						// group_button.innerHTML = "Add group event";
+						// //add group event button listener in pop up window
+						// group_button.addEventListener("click", function(){
+						// 	event.preventDefault();
+						// 	//get time and event content
+						// 	const id = document.getElementById("dateId").value;
+						// 	const idRegex = /\d{4}-\d{2}-\d{2}\w/g;
+						// 	let sqlDate = id.match(idRegex);
+						// 	let dt = String(sqlDate+this_time+":00.000Z");
+						// 	let content = event_content.innerHTML;
 
-							if(content!=""){
-								$("#myform").hide(400);
-								$("#group_popup").show(400);
-								document.getElementById("confirm_group").addEventListener("click", function(event2){
-									event2.preventDefault();
-									//delete from events table
-									let delete_data = id2; 
-									let regex=/\d+/;
-									function get_id(str){
-										if(match=regex.exec(str)){
-											return match[0];
-										}
-									}
-									delete_data = get_id(id2);
-									const data = {'delete_id': delete_data};
-									fetch('delete.php',{
-										method: "POST",
-										body: JSON.stringify(data)
-									})
-									.then(console.log(data))
-									.catch(error=>console.error(error));
-									//add to group_events
-									for(let i=1; i<=group_count; i++){
-										let member_id="group_member"+String(i);
-										if(document.getElementById(member_id).value!=""){
-											let group_member = document.getElementById(member_id).value;
-											const data = {'content': content, 'datetime': dt, 'username': group_member, 'tag': tag_type};
-											fetch('addGroupEvent.php', {
-												method: "POST",
-												body: JSON.stringify(data)
-											})
-											.then(data => {
-												alert(data.message);
-											})
-											.catch(error => console.error(error));
-										}
-										else{/*do nothing if there's no username input*/}
-									}
-									$("#group_popup").hide(400);
-									updateCalendar();
-								}, false)
-							}
-						})
+						// 	if(content!=""){
+						// 		$("#myform").hide(400);
+						// 		$("#group_popup").show(400);
+						// 		document.getElementById("confirm_group").addEventListener("click", function(event2){
+						// 			event2.preventDefault();
+						// 			//delete from events table
+						// 			let delete_data = id2; 
+						// 			let regex=/\d+/;
+						// 			function get_id(str){
+						// 				if(match=regex.exec(str)){
+						// 					return match[0];
+						// 				}
+						// 			}
+						// 			delete_data = get_id(id2);
+						// 			const data = {'delete_id': delete_data};
+						// 			fetch('delete.php',{
+						// 				method: "POST",
+						// 				body: JSON.stringify(data)
+						// 			})
+						// 			.then(console.log(data))
+						// 			.catch(error=>console.error(error));
+						// 			//add to group_events
+						// 			for(let i=1; i<=group_count; i++){
+						// 				let member_id="group_member"+String(i);
+						// 				if(document.getElementById(member_id).value!=""){
+						// 					let group_member = document.getElementById(member_id).value;
+						// 					const data = {'content': content, 'datetime': dt, 'username': group_member, 'tag': tag_type};
+						// 					fetch('addGroupEvent.php', {
+						// 						method: "POST",
+						// 						body: JSON.stringify(data)
+						// 					})
+						// 					.then(data => {
+						// 						alert(data.message);
+						// 					})
+						// 					.catch(error => console.error(error));
+						// 				}
+						// 				else{/*do nothing if there's no username input*/}
+						// 			}
+						// 			$("#group_popup").hide(400);
+						// 			updateCalendar();
+						// 		}, false)
+						// 	}
+						// })
 	
 
-						each_event.appendChild(group_button);
+						// each_event.appendChild(group_button);
 						document.getElementById("dialog_events").appendChild(each_event);
 					}
 				}
@@ -900,6 +902,7 @@
 						let tag_type=data.tag[i];
 						//console.log(tag_type);
 						event_tag.classList=tag_type+"dot";
+						let this_content=data.event[i];
 						event_content.innerHTML=data.event[i]+" ";
 						let dmTime=data.time[i];
 						let this_host=data.host[i];
@@ -918,8 +921,10 @@
 						event_host.setAttribute("class","host_who");
 						each_event.appendChild(event_time);
 						each_event.appendChild(event_host);
+						//modify button
 						let modify_button=document.createElement("button");
 						modify_button.setAttribute("id",id);
+						modify_button.setAttribute("class","modify_buttons");
 						modify_button.innerHTML="modify";
 						modify_button.addEventListener("click",function(){
 							let regex=/\d+/;
@@ -987,6 +992,7 @@
 						//fetch "delete".php wil delete event with this specific id (auto_increment) so it is unique.
 						let delete_button=document.createElement("button");
 						delete_button.setAttribute("id",id2);
+						delete_button.setAttribute("class","delete_buttons");
 						delete_button.innerHTML="delete";
 						//
 						delete_button.addEventListener("click",function(){
@@ -1039,10 +1045,37 @@
 						.then(function(permission) {
 							//console.log(JSON.stringify(permission.message));
 							if(permission.message == "permitted"){
-								each_event.appendChild(modify_button);
-								each_event.appendChild(delete_button);
+								const data2= {'content':this_content,'dt':dmTime,'host':this_host,'tag_type':tag_type, };
+								console.log(data2);
+								fetch("showmember.php",{
+									method: 'POST',
+									body: JSON.stringify(data2),
+									headers: { 'content-type': 'application/json' 
+									//,'X-CSRF-Token': token 
+									}
+								})
+								.then(response => response.json())
+								.then(data=>{
+									console.log(data);
+									if(data.success==true){
+										console.log(data.members);
+										let members="Members: ";
+										for(i=0;i<data.members.length-1;i++){
+											members+=data.members[i]+", ";
+										}
+										let last=data.members.length-1
+										members+=data.members[last];
+										let each_members=document.createElement("span");
+										each_members.setAttribute("class","groupevent_members");
+										each_members.innerHTML=members;
+										each_event.appendChild(each_members);
+										each_event.appendChild(modify_button);
+										each_event.appendChild(delete_button);
+									}
+								})
+								.catch(err => console.error(err));
 							}
-							else{}
+							
 						})
 						.catch(err => console.error(err));
 						document.getElementById("dialog_events").appendChild(each_event);
