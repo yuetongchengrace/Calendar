@@ -1,5 +1,6 @@
 body{
     text-align:center;
+    background-color:#f4eaea;
 }
 
 #login_title{
@@ -87,7 +88,7 @@ td{
 }
 .td_div{
     position: relative;
-    height:150px;
+    height:90px;
     display:block;
     text-align:left;
     overflow: scroll;
@@ -182,7 +183,22 @@ textarea{
     border-radius:50%;
     display:inline-block;
 }
-
+input[type='checkbox']{
+    width:15px;
+    height:15px;
+}
+#label_work{
+    color:rgb(211, 72, 142);
+    font-size:25px;
+}
+#label_social{
+    color:#d3b560;
+    font-size:25px;
+}
+#label_other{
+    color:rgb(22, 189, 172);
+    font-size:25px;
+}
 #container{
     width:60%;
     margin-left:19%;
