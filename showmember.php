@@ -1,4 +1,5 @@
 <?php
+    ini_set("session.cookie_httponly", 1);
     session_start();
     header("Content-Type: application/json"); 
     $json_str = file_get_contents('php://input');
@@ -10,7 +11,7 @@
     $tag=$json_obj['tag_type'];
     $username=$_SESSION['username'];
     require 'database.php';
-    $stmt = $mysqli->prepare("select username from group_events where host='$host' AND content='$content' AND time='$time' AND tag='$tag'");
+    $stmt = $mysqli->prepare("select username from group_events where host=? AND content=? AND time=? AND tag=?");
     if(!$stmt){
         echo json_encode(array(
             "success" => false,
@@ -18,11 +19,13 @@
         ));
         exit;
     }
+    $stmt->bind_param('ssss', $host, $content, $time, $tag);
     $stmt->execute();
     $stmt->bind_result($users);
     $array=array();
     while($stmt->fetch()){
-        array_push($array,$users);
+        $safe_users=htmlentities($users);
+        array_push($array,$safe_users);
     }
     if(count($array)>=1){
         echo json_encode(array(

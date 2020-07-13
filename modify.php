@@ -1,4 +1,5 @@
 <?php
+    ini_set("session.cookie_httponly", 1);
     session_start();
     header("Content-Type: application/json"); 
     $json_str = file_get_contents('php://input');
@@ -7,10 +8,18 @@
     $username=$_SESSION['username'];
     $modify_id = $json_obj['modify_id'];
     $changed_content = $json_obj['changed_content'];
+    $token = $json_obj['token'];
 
     require 'database.php';
+    if(!hash_equals($_SESSION['token'], (string)$token)){
+        echo json_encode(array(
+            "success" => false,
+            "message" => "Request forgery detected"
+        ));
+        exit;
+    }
 
-    $stmt = $mysqli->prepare("update events set content='$changed_content' where event_id=?");
+    $stmt = $mysqli->prepare("update events set content=? where event_id=?");
     
     if(!$stmt){
         echo json_encode(array(
@@ -20,7 +29,7 @@
         exit;
     }
     
-    $stmt->bind_param('i', $modify_id);
+    $stmt->bind_param('si',$changed_content, $modify_id);
     
     $stmt->execute();
     

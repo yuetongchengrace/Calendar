@@ -1,4 +1,5 @@
 <?php
+    ini_set("session.cookie_httponly", 1);
     session_start();
     header("Content-Type: application/json"); 
     $json_str = file_get_contents('php://input');
@@ -8,7 +9,7 @@
     $user = $_SESSION['username'];
 
     require 'database.php';
-    $stmt = $mysqli->prepare("select host from group_events where event_id='$id'");
+    $stmt = $mysqli->prepare("select host from group_events where event_id=?");
     if(!$stmt){
         echo json_encode(array(
             "success" => false,
@@ -17,10 +18,11 @@
         exit;
     }
 
+    $stmt->bind_param('i', $id);
     $stmt->execute();
     $result= $stmt->get_result();
     $row = $result->fetch_assoc();
-    $host = $row['host'];
+    $host = htmlentities($row['host']);
     $stmt->close();
 
     if($host == $user){

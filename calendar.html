@@ -21,6 +21,7 @@
 	</div>
 	<br>
 	<script>
+		let token;
 		document.getElementById("login_or_out").addEventListener("click",function(){
 			window.location.href="logout.php";
 		});
@@ -34,6 +35,7 @@
 				if(response.success==true){
 					document.getElementById("logged_in_user").textContent="User: "+response.username;
 					session_check=true;
+					token=response.token;
 				}
 				else{
 					document.getElementById("logged_in_user").textContent="Visitor";
@@ -194,13 +196,11 @@
 			else{
 				data = {'current_month': (String)(currentMonth.year)+"-"+(String)(currentMonth.month+1)};
 			}
-			//console.log(data);
-			//const token= document.getElementsByName("token").value;
+			
 				fetch("checkmonth.php", {
 					method: 'POST',
 					body: JSON.stringify(data),
 					headers: { 'content-type': 'application/json' 
-					//,'X-CSRF-Token': token 
 					}
 				})
 				.then(response => response.json())
@@ -286,13 +286,10 @@
 		function DisplayEventAjax(day,each) {
 			const data = {'day': day};
 			// Make a URL-encoded string for passing POST data:
-			//const data = { 'username': username, 'password': password };
-			const token= document.getElementsByName("token").value;
 				fetch("showevent.php", {
 					method: 'POST',
 					body: JSON.stringify(data),
 					headers: { 'content-type': 'application/json' 
-					//,'X-CSRF-Token': token 
 					}
 				})
 				.then(response => response.json())
@@ -335,7 +332,6 @@
 						method: 'POST',
 						body: JSON.stringify(data),
 						headers: { 'content-type': 'application/json' 
-						//,'X-CSRF-Token': token 
 						}
 					})
 				.then(response => response.json())
@@ -412,7 +408,7 @@
 	<div class="dialog" id="group_popup">
 		<form id="group_form">
 			<div>Enter usernames of your group members here:</div>
-			<input type="text" id="group_member1"></input>
+			<input type="text" id="group_member1">
 			<button id="add_another_user">+</button><br>
 		</form>
 		<button id="confirm_group">Confirm</button>
@@ -529,13 +525,12 @@
 							// 	date.appendChild(each);
 								
 							// }
-							const data = {'content': content, 'datetime': dt, 'username': group_member, 'tag': selected};
+							const data = {'content': content, 'datetime': dt, 'username': group_member, 'tag': selected, 'token': token};
 							//console.log(data);
 							fetch('addGroupEvent.php', {
 								method: "POST",
 								body: JSON.stringify(data),
 								headers: { 'content-type': 'application/json' 
-								//,'X-CSRF-Token': token 
 								}
 							})
 							.then(response => response.json())
@@ -647,13 +642,13 @@
 				let sqlDate = id.match(idRegex);
 				let time = document.getElementById("time").value;
 				let dt = String(sqlDate+time+":00.000Z");
-				const data = {'content': content, 'datetime': dt,'tag':selected};
+				const data = {'content': content, 'datetime': dt, 'tag': selected, 'token': token};
 				fetch('addEvent.php', {
 					method: "POST",
 					body: JSON.stringify(data)
 				})
 				.then(response => response.json())
-				.then(console.log(data))
+				.then(stuff => console.log(stuff.message))
 				.catch(error => console.error(error));
 			}
 
@@ -666,14 +661,12 @@
 			const today_date=id.substring(0,10);
    			document.getElementById("today").appendChild(document.createTextNode(today_date));
 			const data = {'day': id};
-			const token= document.getElementsByName("token").value;
 			//get response of two arrays, data.event consisting all event contents and data.event_id consisting all event ids
 			//the same event will have the same index in both arrays;
 			fetch("showevent.php", {
 					method: 'POST',
 					body: JSON.stringify(data),
 					headers: { 'content-type': 'application/json' 
-					//,'X-CSRF-Token': token 
 					}
 				})
 			.then(response => response.json())
@@ -749,15 +742,12 @@
 								if(document.getElementById(modify_text_id).value!=""){
 								
 									const modified_content = document.getElementById(modify_text_id).value;//get text from modify_text
-									//console.log(modified_content);
-									//onsole.log(modify_id);
-									const data = {'modify_id': modify_id, 'changed_content': modified_content};
-									const token= document.getElementsByName("token").value;
+									const data = {'modify_id': modify_id, 'changed_content': modified_content, 'token': token};
+									
 									fetch("modify.php", {
 											method: 'POST',
 											body: JSON.stringify(data),
 											headers: { 'content-type': 'application/json' 
-											//,'X-CSRF-Token': token 
 											}
 										})
 									.then(response => response.json())
@@ -792,18 +782,15 @@
 								}
 							}
 							let delete_id=get_id(this.id);
-							const data = {'delete_id': delete_id};
-							const token= document.getElementsByName("token").value;
+							const data = {'delete_id': delete_id, 'token': token};
 							fetch("delete.php", {
 									method: 'POST',
 									body: JSON.stringify(data),
 									headers: { 'content-type': 'application/json' 
-									//,'X-CSRF-Token': token 
 									}
 								})
 							.then(response => response.json())
 							.then(data => {
-								//console.log(data.success ? "Succesfully delete event" : `Delete event failed ${data.message}`);
 								if(data.success==true){
 									//remove the parent div node of this delete_button from the pop up window
 									let parent=delete_button.parentNode;
@@ -888,7 +875,6 @@
 					method: 'POST',
 					body: JSON.stringify(data),
 					headers: { 'content-type': 'application/json' 
-					//,'X-CSRF-Token': token 
 					}
 				})
 			.then(response => response.json())
@@ -964,15 +950,14 @@
 									const modified_content = document.getElementById(modify_text_id).value;//get text from modify_text
 									console.log(dmTime);
 									let old_content = event_content.innerHTML.trim();
-									const data = {'modify_content': old_content, 'changed_content': modified_content, 'time':dmTime};
-									const token= document.getElementsByName("token").value;
+									const data = {'modify_content': old_content, 'changed_content': modified_content, 'time':dmTime, 'token': token};
 									fetch("groupModify.php", {
 											method: 'POST',
 											body: JSON.stringify(data),
 											headers: { 'content-type': 'application/json' 
-											//,'X-CSRF-Token': token 
-											}
-										})
+										}
+									})
+									.then(response => response.json())
 									.then(data => {
 										console.log(data.success ? "Succesfully modify event" : `Modify event failed ${data.message}`);
 										updateCalendar();
@@ -1005,13 +990,12 @@
 							}
 							let delete_id=get_id(this.id);
 							let old_content = event_content.innerHTML.trim();
-							const data = {'old_content': old_content, 'time': dmTime};
-							const token= document.getElementsByName("token").value;
+							const data = {'old_content': old_content, 'time': dmTime, 'token': token};
+							
 							fetch("groupDelete.php", {
 									method: 'POST',
 									body: JSON.stringify(data),
 									headers: { 'content-type': 'application/json' 
-									//,'X-CSRF-Token': token 
 									}
 								})
 							.then(response => response.json())
@@ -1038,7 +1022,6 @@
 							method: 'POST',
 							body: JSON.stringify(id_data),
 							headers: { 'content-type': 'application/json' 
-							//,'X-CSRF-Token': token 
 							}
 						})
 						.then(response => response.json())
@@ -1051,7 +1034,6 @@
 									method: 'POST',
 									body: JSON.stringify(data2),
 									headers: { 'content-type': 'application/json' 
-									//,'X-CSRF-Token': token 
 									}
 								})
 								.then(response => response.json())
@@ -1059,7 +1041,7 @@
 									console.log(data);
 									if(data.success==true){
 										console.log(data.members);
-										let members="Members: ";
+										let members=" Members: ";//added a space before "Members"
 										for(i=0;i<data.members.length-1;i++){
 											members+=data.members[i]+", ";
 										}

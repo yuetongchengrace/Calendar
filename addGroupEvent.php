@@ -1,4 +1,5 @@
 <?php
+    ini_set("session.cookie_httponly", 1);
     session_start();
     header("Content-Type: application/json"); 
     $json_str = file_get_contents('php://input');
@@ -6,9 +7,11 @@
     $json_obj = json_decode($json_str, true);
     $content = $json_obj['content'];
     $dt = $json_obj['datetime'];
-    $member = $json_obj['username'];
+    $member = htmlentities($json_obj['username']);
     $host = $_SESSION['username'];
     $tag = $json_obj['tag'];
+    $token = $json_obj['token'];
+
     if($host==$member){
         echo json_encode(array(
             "success" => false,
@@ -18,10 +21,18 @@
     }
     require 'database.php';
 
+    if(!hash_equals($_SESSION['token'], (string)$token)){
+        echo json_encode(array(
+            "success" => false,
+            "message" => "Request forgery detected"
+        ));
+        exit;
+    }
+
     //odd statements are for checking existence for group event
     //see if the group member exists already; if not, add member
     $message_member="";
-    $stmt1 = $mysqli->prepare("select * from group_events where username='$member' AND content='$content' AND time='$dt' AND tag='$tag'");
+    $stmt1 = $mysqli->prepare("select * from group_events where username=? AND content=? AND time=? AND tag=?");
     if(!$stmt1){
         echo json_encode(array(
             "success" => false,
@@ -30,6 +41,7 @@
         exit;
     }
 
+    $stmt1->bind_param('ssss', $member, $content, $dt, $tag);
     $stmt1->execute();
     $result = $stmt1->get_result();
     $row = $result->fetch_assoc();
@@ -94,7 +106,7 @@
     }
     
     //see if the host exists already; if not, add host
-    $stmt3 = $mysqli->prepare("select * from group_events where username='$host' AND content='$content' AND time='$dt' AND tag='$tag'");
+    $stmt3 = $mysqli->prepare("select * from group_events where username=? AND content=? AND time=? AND tag=?");
     if(!$stmt3){
         echo json_encode(array(
             "success" => true,
@@ -102,6 +114,7 @@
         ));	
         exit;
     }
+    $stmt3->bind_param('ssss', $host, $content, $dt, $tag);
     $stmt3->execute();
     $stmt3->store_result();
     if($stmt3->num_rows==0){

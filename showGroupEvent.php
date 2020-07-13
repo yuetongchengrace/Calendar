@@ -1,4 +1,5 @@
 <?php
+    ini_set("session.cookie_httponly", 1);
     session_start();
     header("Content-Type: application/json"); 
     $json_str = file_get_contents('php://input');
@@ -15,7 +16,7 @@
     }
     $day_left=substr($day, 0, 10);
     require 'database.php';
-    $stmt = $mysqli->prepare("select content, event_id, time, tag, host from group_events where LEFT(time, 10)='$day_left' AND username='$username'");
+    $stmt = $mysqli->prepare("select content, event_id, time, tag, host from group_events where LEFT(time, 10)=? AND username=?");
     if(!$stmt){
         echo json_encode(array(
             "success" => false,
@@ -23,19 +24,24 @@
         ));
         exit;
     }
+    $stmt->bind_param('ss', $day_left, $username);
     $stmt->execute();
     $stmt->bind_result($event,$event_id,$time,$tag,$host);
+
     $array=array();
     $array2=array();
     $array3=array();
     $array4=array();
     $array5=array();
     while($stmt->fetch()){
-        array_push($array,$event);
+        $safe_event=htmlentities($event);
+        $safe_time=htmlentities($time);
+        $safe_host=htmlentities($host);
+        array_push($array,$safe_event);
         array_push($array2,$event_id);
-        array_push($array3,$time);
+        array_push($array3,$safe_time);
         array_push($array4,$tag);
-        array_push($array5,$host);
+        array_push($array5,$safe_host);
     }
     if(count($array)>=1){
         echo json_encode(array(
