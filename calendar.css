@@ -4,13 +4,16 @@ body{
 }
 
 #login_title{
-    margin-top:300px;
+    margin-top:250px;
     font-family: 'Catamaran', sans-serif;
     font-size:30px;
     margin-bottom:50px;
 }
 #login_information{
     margin-bottom:30px;
+}
+#login_form{
+    font-size:22px;
 }
 #buttons button{
     padding:5px;
