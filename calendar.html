@@ -472,14 +472,26 @@
 			const idRegex = /\d{4}-\d{2}-\d{2}\w/g;
 			let sqlDate = id.match(idRegex);
 			let time = document.getElementById("time").value;
-			let dt = String(sqlDate+time+":00.000Z");
-			let content = document.getElementById("event_content").value;
-			
-			if(content!=""){
-				$("#myform").hide(400);
-				$("#group_popup").show(400);
-				group_count = 1;
-				document.getElementById("group_member1").value = "";	
+			let time_regex=/\d\d:\d\d/;
+			function check_time(str){
+				console.log("test");
+				if(match=time_regex.exec(str)){
+					return match;
+				}
+			}
+			let time_match=check_time(time);
+			if(time_match==null){
+				alert("time not in the right format");
+			}
+			else{
+				let dt = String(sqlDate+time+":00.000Z");
+				let content = document.getElementById("event_content").value;
+				if(content!=""){
+					$("#myform").hide(400);
+					$("#group_popup").show(400);
+					group_count = 1;
+					document.getElementById("group_member1").value = "";	
+				}
 			}
 		}, false)
 		document.getElementById("confirm_group").addEventListener("click", function(event2){
@@ -619,37 +631,56 @@
 				let social_check=document.getElementById("checkbox_social").checked;
 				let other_check=document.getElementById("checkbox_other").checked;
 				//don't do anything if this type of event is not supposed to be shown
-				if(selected=="work"&&work_check!=true){
-				}
-				else if(selected=="social"&&social_check!=true){
-				}
-				else if (selected=="other"&&other_check!=true){
-				}
-				else{
-					let each = document.createElement("div");
-					let each_event_title=document.createElement("span");
-					each_event_title.innerHTML=content+" ";
-					let each_event_time=document.createElement("span");
-					each_event_time.innerHTML=document.getElementById("time").value;
-					each.appendChild(each_event_title);
-					each.appendChild(each_event_time);
-					each.classList="one_event";
-					each.classList+=" "+selected;
-					date.appendChild(each);
-					
-				}
 				const idRegex = /\d{4}-\d{2}-\d{2}\w/g;
 				let sqlDate = id.match(idRegex);
 				let time = document.getElementById("time").value;
-				let dt = String(sqlDate+time+":00.000Z");
-				const data = {'content': content, 'datetime': dt, 'tag': selected, 'token': token};
-				fetch('addEvent.php', {
-					method: "POST",
-					body: JSON.stringify(data)
-				})
-				.then(response => response.json())
-				.then(stuff => console.log(stuff.message))
-				.catch(error => console.error(error));
+				let time_regex=/\d\d:\d\d/;
+				function check_time(str){
+					console.log("test");
+					if(match=time_regex.exec(str)){
+						return match;
+					}
+				}
+				let time_match=check_time(time);
+				if(time_match==null){
+					alert("time not in the right format");
+				}
+				else{
+					let dt = String(sqlDate+time+":00.000Z");
+					const data = {'content': content, 'datetime': dt, 'tag': selected, 'token': token};
+					fetch('addEvent.php', {
+						method: "POST",
+						body: JSON.stringify(data)
+					})
+					.then(response => response.json())
+					.then(stuff => {
+						console.log(stuff.message)
+						if(stuff.success==false){
+							alert(stuff.message);
+						}
+						}
+					)
+					.catch(error => console.error(error));
+					if(selected=="work"&&work_check!=true){
+					}
+					else if(selected=="social"&&social_check!=true){
+					}
+					else if (selected=="other"&&other_check!=true){
+					}
+					else{
+						let each = document.createElement("div");
+						let each_event_title=document.createElement("span");
+						each_event_title.innerHTML=content+" ";
+						let each_event_time=document.createElement("span");
+						each_event_time.innerHTML=document.getElementById("time").value;
+						each.appendChild(each_event_title);
+						each.appendChild(each_event_time);
+						each.classList="one_event";
+						each.classList+=" "+selected;
+						date.appendChild(each);
+						
+					}
+				}
 			}
 
 		}, false);
