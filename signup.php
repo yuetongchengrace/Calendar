@@ -40,7 +40,7 @@
                 $check_user_not_exist=false;
                 echo json_encode(array(
                     "success" => false,
-                    "message" => "Already signed up!"
+                    "message" => "Already signed up",
                 ));
                 exit;
             }
