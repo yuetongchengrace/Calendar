@@ -112,7 +112,14 @@ td{
     width:500px;
     text-align:center;
 }
-
+.individual_event_div{
+    color:rgb(4, 4, 109);
+}
+.group_event_div{
+    color:rgb(135, 25, 135);
+    font-size:17px;
+    font-family:'Catamaran', sans-serif;
+}
 #events{
     text-align:left;
     padding-left:10px;

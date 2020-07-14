@@ -13,3 +13,13 @@
 http://ec2-3-136-116-147.us-east-2.compute.amazonaws.com/~ChenyeQi/module5-group/login.html
 
 Users: ha, he, hi (Passwords are the same as usernames)
+
+### Group Event Design: 
+Any registered user can add group event after they click the add group event button and add the username of other registered users.
+If they only added wrong usernames, the group event will not be successfully added.
+If they added some existing users and some wrong usernames, they group event will be added but only to the existing users.
+Only the host can modify or delete the group event.
+Members can see who the host is for the group event, host can information of members as well.
+
+Example of group event shown on host: **study session 10:00 Host: ha Members: he, ha [modify button] [delete button]**
+Example of group event shown on members(not host): **study session 10:00 Host: ha**

@@ -709,6 +709,7 @@
 						console.log(data.event);
 						//console.log(data.event_id[i]);
 						let each_event=document.createElement("div");
+						each_event.setAttribute("class","individual_event_div");
 						let event_tag=document.createElement("span");
 						let tag_type=data.tag[i];
 						event_tag.classList=tag_type+"dot";
@@ -716,15 +717,10 @@
 						let event_content=document.createElement("span");
 						event_content.innerHTML=data.event[i]+" ";
 						let content_html=data.event[i];
-						//console.log(data.event[i]);
-						//this part is important, data.event_id[i] will be saved in a seperate variable.
-						//I added "modify" or "delete" in the beginning to distinguish different ids.
-						//id is for modify buttons and id2 is for delete buttons.
-						//later used to set button ids, so we can use them later in fetch("delete.php").
+						//add string in the beginning to distinguish different ids and used for different buttons
 						id="modify"+data.event_id[i];
 						id2="delete"+data.event_id[i];
 						id3="group"+data.event_id[i];
-						//console.log(id);
 						each_event.appendChild(event_tag);
 						each_event.appendChild(event_content);
 						let event_time=document.createElement("span");
@@ -752,7 +748,6 @@
 								let child = document.getElementById(form_id);
 								child.parentNode.removeChild(child);
 							}
-							//console.log(modify_button.parentElement);
 							//creating modify_form containing a text field and a button for modifying event
 							let modify_text = document.createElement("INPUT");
 							modify_text.setAttribute("type", "text");
@@ -761,7 +756,6 @@
 							let modify_confirm = document.createElement("button");
 							modify_confirm.innerHTML = "confirm";
 							modify_confirm.setAttribute("id", modify_confirm_id);
-							//console.log(modify_text_id);
 							
 							let modify_form = document.getElementById("dialog_events").appendChild(document.createElement("form"));
 							modify_form.setAttribute("id", form_id);
@@ -796,15 +790,11 @@
 						});
 						each_event.appendChild(modify_button);
 
-						//click delete button will fetch delete.php which deletes event from the events table using event_id we passed in.
-						//Set id of this specific delete_button to be id2(aka "delete"+data.event_id[i] from earlier)
-						//We need to use regular expression and match out the integer part (discard the "delete" part).
-						//fetch "delete".php wil delete event with this specific id (auto_increment) so it is unique.
+						//click delete button will fetch delete.php which deletes event from the events table using delete_id we passed in.
 						let delete_button=document.createElement("button");
 						delete_button.setAttribute("id",id2);
 						delete_button.setAttribute("class","delete_buttons");
 						delete_button.innerHTML="delete";
-						//
 						delete_button.addEventListener("click",function(){
 							let regex=/\d+/;
 							function get_id(str){
@@ -827,8 +817,6 @@
 									let parent=delete_button.parentNode;
 									document.getElementById("dialog_events").removeChild(parent);
 									//updateCalendar so we won't see the removed event on the html table.
-									//might not be the most efficient.Does not refresh the page but will
-									//call updateCalendar again and display all events again without the deleted event
 									updateCalendar();
 								}
 							})
@@ -836,66 +824,6 @@
 
 						});
 						each_event.appendChild(delete_button);
-
-						// let group_button = document.createElement("button");
-						// group_button.setAttribute("id", id3);
-						// group_button.innerHTML = "Add group event";
-						// //add group event button listener in pop up window
-						// group_button.addEventListener("click", function(){
-						// 	event.preventDefault();
-						// 	//get time and event content
-						// 	const id = document.getElementById("dateId").value;
-						// 	const idRegex = /\d{4}-\d{2}-\d{2}\w/g;
-						// 	let sqlDate = id.match(idRegex);
-						// 	let dt = String(sqlDate+this_time+":00.000Z");
-						// 	let content = event_content.innerHTML;
-
-						// 	if(content!=""){
-						// 		$("#myform").hide(400);
-						// 		$("#group_popup").show(400);
-						// 		document.getElementById("confirm_group").addEventListener("click", function(event2){
-						// 			event2.preventDefault();
-						// 			//delete from events table
-						// 			let delete_data = id2; 
-						// 			let regex=/\d+/;
-						// 			function get_id(str){
-						// 				if(match=regex.exec(str)){
-						// 					return match[0];
-						// 				}
-						// 			}
-						// 			delete_data = get_id(id2);
-						// 			const data = {'delete_id': delete_data};
-						// 			fetch('delete.php',{
-						// 				method: "POST",
-						// 				body: JSON.stringify(data)
-						// 			})
-						// 			.then(console.log(data))
-						// 			.catch(error=>console.error(error));
-						// 			//add to group_events
-						// 			for(let i=1; i<=group_count; i++){
-						// 				let member_id="group_member"+String(i);
-						// 				if(document.getElementById(member_id).value!=""){
-						// 					let group_member = document.getElementById(member_id).value;
-						// 					const data = {'content': content, 'datetime': dt, 'username': group_member, 'tag': tag_type};
-						// 					fetch('addGroupEvent.php', {
-						// 						method: "POST",
-						// 						body: JSON.stringify(data)
-						// 					})
-						// 					.then(data => {
-						// 						alert(data.message);
-						// 					})
-						// 					.catch(error => console.error(error));
-						// 				}
-						// 				else{/*do nothing if there's no username input*/}
-						// 			}
-						// 			$("#group_popup").hide(400);
-						// 			updateCalendar();
-						// 		}, false)
-						// 	}
-						// })
-	
-
-						// each_event.appendChild(group_button);
 						document.getElementById("dialog_events").appendChild(each_event);
 					}
 				}
@@ -910,14 +838,13 @@
 				})
 			.then(response => response.json())
 			.then(data => {
-				//console.log(data.success ? "Succesfully display event" : `Display event failed ${data.message}`);
 				if(data.success==true){
 					for(i=0;i<data.event.length;i++){
 						let each_event=document.createElement("div");
+						each_event.setAttribute("class","group_event_div");
 						let event_content=document.createElement("span");
 						let event_tag=document.createElement("span");
 						let tag_type=data.tag[i];
-						//console.log(tag_type);
 						event_tag.classList=tag_type+"dot";
 						let this_content=data.event[i];
 						event_content.innerHTML=data.event[i]+" ";
@@ -1002,10 +929,7 @@
 
 						});
 
-						//click delete button will fetch delete.php which deletes event from the events table using event_id we passed in.
-						//Set id of this specific delete_button to be id2(aka "delete"+data.event_id[i] from earlier)
-						//We need to use regular expression and match out the integer part (discard the "delete" part).
-						//fetch "delete".php wil delete event with this specific id (auto_increment) so it is unique.
+						//click delete button will fetch delete.php which deletes event from the events table using delete_id we passed in.
 						let delete_button=document.createElement("button");
 						delete_button.setAttribute("id",id2);
 						delete_button.setAttribute("class","delete_buttons");
@@ -1031,14 +955,11 @@
 								})
 							.then(response => response.json())
 							.then(data => {
-								//console.log(data.success ? "Succesfully delete event" : `Delete event failed ${data.message}`);
 								if(data.success==true){
 									//remove the parent div node of this delete_button from the pop up window
 									let parent=delete_button.parentNode;
 									document.getElementById("dialog_events").removeChild(parent);
 									//updateCalendar so we won't see the removed event on the html table.
-									//might not be the most efficient.Does not refresh the page but will
-									//call updateCalendar again and display all events again without the deleted event
 									updateCalendar();
 								}
 							})
@@ -1046,7 +967,7 @@
 
 						});
 
-						//check if the session user is the host, if not do not display button modify or delete
+						//check if the session user is the host, if not do not display members or button modify or delete
 						let id_data = {'id': originalID};
 						//console.log(id_data);
 						fetch("checkHost.php",{
@@ -1060,7 +981,6 @@
 							//console.log(JSON.stringify(permission.message));
 							if(permission.message == "permitted"){
 								const data2= {'content':this_content,'dt':dmTime,'host':this_host,'tag_type':tag_type, };
-								console.log(data2);
 								fetch("showmember.php",{
 									method: 'POST',
 									body: JSON.stringify(data2),
@@ -1069,9 +989,7 @@
 								})
 								.then(response => response.json())
 								.then(data=>{
-									console.log(data);
 									if(data.success==true){
-										console.log(data.members);
 										let members=" Members: ";//added a space before "Members"
 										for(i=0;i<data.members.length-1;i++){
 											members+=data.members[i]+", ";
