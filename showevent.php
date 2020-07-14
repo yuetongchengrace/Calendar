@@ -20,7 +20,7 @@
     if(!$stmt){
         echo json_encode(array(
             "success" => false,
-            "message" => "No event for today"
+            "message" => "Query prep failed"
         ));
         exit;
     }
@@ -55,7 +55,7 @@
     else{
         echo json_encode(array(
             "success" => false,
-            "message" => "no event"
+            "message" => "No event for today"
         ));	
         exit;
         $stmt->close();

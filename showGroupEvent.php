@@ -59,7 +59,7 @@
     else{
         echo json_encode(array(
             "success" => false,
-            "message" => "no event"
+            "message" => "no group event for today"
         ));	
         exit;
         $stmt->close();

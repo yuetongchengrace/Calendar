@@ -30,7 +30,6 @@
 		fetch("checkUser.php")
 			.then(response => response.json())
 			.then(function(response) {
-				//console.log(JSON.stringify(response.message));
 				document.getElementById("login_or_out").textContent = response.message;
 				if(response.success==true){
 					document.getElementById("logged_in_user").textContent="User: "+response.username;
@@ -240,28 +239,6 @@
 								if(match_month!=currentMonth.month+1){
 									each.classList.add("not_this_month");
 								}
-								let session_check="";
-								fetch("checkUser.php")
-									.then(response => response.json())
-									.then(function(response) {
-										//console.log(JSON.stringify(response.message));
-										if(response.success==true){
-											$(each).click(function(){
-											$("#event_content").val("");
-											id=$(this).attr("id");
-											$("#myform input[type=text]").val('');
-											$("#myform").show(500);
-											$('#dateId').val(id);
-											displayEventByDay(id);
-											$("#time").val("");
-										});
-											session_check="true";
-										}
-										else{
-											session_check="false";
-										}
-									})
-									.catch(err => console.error(err));
 								let text=document.createElement("div");
 								text.innerHTML=match;
 								text.classList="date_num";
@@ -270,6 +247,17 @@
 									each.firstChild.classList.add("today");
 								}
 								htmlDayObj.appendChild(each);
+								if(data.user!="visitor"){
+									$(each).click(function(){
+									$("#event_content").val("");
+									id=$(this).attr("id");
+									$("#myform input[type=text]").val('');
+									$("#myform").show(500);
+									$('#dateId').val(id);
+									displayEventByDay(id);
+									$("#time").val("");
+									});
+								}
 								if(display==true&&data.user!="visitor"){
 									DisplayEventAjax(day,each);
 									console.log("getting this month");
@@ -472,7 +460,6 @@
 			let time = document.getElementById("time").value;
 			let time_regex=/\d\d:\d\d/;
 			function check_time(str){
-				console.log("test");
 				if(match=time_regex.exec(str)){
 					return match;
 				}
@@ -505,15 +492,12 @@
 			event2.preventDefault();
 			//add to group_events
 			for(let i=1; i<=group_count; i++){
-				console.log(group_count);
-				console.log(i);
 				let member_id="group_member"+String(i);
 				if(document.getElementById(member_id).value!=""){
 					let content = document.getElementById("event_content").value;
 					let selected=document.getElementById("tag_value").value;
 					let group_member = document.getElementById(member_id).value;
 					const data = {'content': content, 'datetime': dt, 'username': group_member, 'tag': selected, 'token': token};
-					//console.log(data);
 					fetch('addGroupEvent.php', {
 						method: "POST",
 						body: JSON.stringify(data),
@@ -563,7 +547,6 @@
 				let this_member_id = "group_member"+String(group_count);
 				this_member.setAttribute("id", this_member_id);
 				div.appendChild(this_member);
-				//this_member.textContent = 
 				document.getElementById("group_form").appendChild(div);
 			})
 			document.getElementById("event_content").value = "";
@@ -667,18 +650,16 @@
 				})
 			.then(response => response.json())
 			.then(data => {
-				console.log(data.success ? "Succesfully display event" : `Display event failed ${data.message}`);
+				console.log(data.success ? "Succesfully display individual event" : `${data.message}`);
 				if(data.success==true){
 					//loop through and print event contents, each with a modify and a delete button
 					for(i=0;i<data.event.length;i++){
-						console.log(data.event);
 						//console.log(data.event_id[i]);
 						let each_event=document.createElement("div");
 						each_event.setAttribute("class","individual_event_div");
 						let event_tag=document.createElement("span");
 						let tag_type=data.tag[i];
 						event_tag.classList=tag_type+"dot";
-						console.log(tag_type);
 						let event_content=document.createElement("span");
 						event_content.innerHTML=data.event[i]+" ";
 						let content_html=data.event[i];
@@ -803,6 +784,7 @@
 				})
 			.then(response => response.json())
 			.then(data => {
+				console.log(data.success ? "Succesfully display group event" : `${data.message}`);
 				if(data.success==true){
 					for(i=0;i<data.event.length;i++){
 						let each_event=document.createElement("div");
