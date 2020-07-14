@@ -15,6 +15,10 @@ body{
 #login_form{
     font-size:22px;
 }
+#sign_up_page{
+    margin-top:250px;
+    font-size:20px;
+}
 #buttons button{
     padding:5px;
     border-radius:5%;
