@@ -19,7 +19,7 @@ Any registered user can add group event after they click the add group event but
 If they only added wrong usernames, the group event will not be successfully added. <br />
 If they added some existing users and some wrong usernames, they group event will be added but only to the existing users. <br />
 Only the host can modify or delete the group event. <br />
-Members can see who the host is for the group event, host can information of members as well. <br />
+Members can see who the host is for the group event, while host can see information of members as well. <br />
 
 Example of group event shown on host: **study session 10:00 Host: ha Members: he, ha [modify button] [delete button]** <br />
 Example of group event shown on members(not host): **study session 10:00 Host: ha**
