@@ -5,7 +5,7 @@
 	$json_obj = json_decode($json_str, true);
 
 	//Variables can be accessed as such:
-	$username = $json_obj['username'];
+	$username = htmlentities($json_obj['username']);
 	$password = $json_obj['password'];
 	//This is equivalent to what you previously did with $_POST['username'] and $_POST['password']
 

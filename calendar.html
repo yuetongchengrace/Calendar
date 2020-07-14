@@ -240,15 +240,28 @@
 								if(match_month!=currentMonth.month+1){
 									each.classList.add("not_this_month");
 								}
-								$(each).click(function(){
-									$("#event_content").val("");
-									id=$(this).attr("id");
-									$("#myform input[type=text]").val('');
-									$("#myform").show(500);
-									$('#dateId').val(id);
-									displayEventByDay(id);
-									$("#time").val("");
-								});
+								let session_check="";
+								fetch("checkUser.php")
+									.then(response => response.json())
+									.then(function(response) {
+										//console.log(JSON.stringify(response.message));
+										if(response.success==true){
+											$(each).click(function(){
+											$("#event_content").val("");
+											id=$(this).attr("id");
+											$("#myform input[type=text]").val('');
+											$("#myform").show(500);
+											$('#dateId').val(id);
+											displayEventByDay(id);
+											$("#time").val("");
+										});
+											session_check="true";
+										}
+										else{
+											session_check="false";
+										}
+									})
+									.catch(err => console.error(err));
 								let text=document.createElement("div");
 								text.innerHTML=match;
 								text.classList="date_num";
@@ -257,25 +270,10 @@
 									each.firstChild.classList.add("today");
 								}
 								htmlDayObj.appendChild(each);
-								//call to function that displays event of that day
-								// let session_check="";
-								// fetch("checkUser.php")
-								// 	.then(response => response.json())
-								// 	.then(function(response) {
-								// 		//console.log(JSON.stringify(response.message));
-								// 		if(response.success==true){
-								// 			session_check="true";
 								if(display==true&&data.user!="visitor"){
 									DisplayEventAjax(day,each);
 									console.log("getting this month");
 								}
-								//console.log(data.user);
-									// 	}
-									// 	else{
-									// 		session_check="false";
-									// 	}
-									// })
-									// .catch(err => console.error(err));
 							}
 						}
 					
@@ -495,114 +493,82 @@
 			}
 		}, false)
 		document.getElementById("confirm_group").addEventListener("click", function(event2){
-					//console.log(content);
-					$("#group_popup").hide(400);
-					const id = document.getElementById("dateId").value;
-					const idRegex = /\d{4}-\d{2}-\d{2}\w/g;
-					let sqlDate = id.match(idRegex);
-					let time = document.getElementById("time").value;
-					let dt = String(sqlDate+time+":00.000Z");
-					event2.preventDefault();
-					//add to group_events
-					for(let i=1; i<=group_count; i++){
-						console.log(group_count);
-						console.log(i);
-						let member_id="group_member"+String(i);
-						if(document.getElementById(member_id).value!=""){
-							// const id = document.getElementById("dateId").value;
-							// let date = document.getElementById(id);
-							let content = document.getElementById("event_content").value;
-							let selected=document.getElementById("tag_value").value;
-							let group_member = document.getElementById(member_id).value;
-							// let work_check=document.getElementById("checkbox_work").checked;
-							// let social_check=document.getElementById("checkbox_social").checked;
-							// let other_check=document.getElementById("checkbox_other").checked;
-							// //don't do anything if this type of event is not supposed to be shown
-							// if(selected=="work"&&work_check!=true){
-							// }
-							// else if(selected=="social"&&social_check!=true){
-							// }
-							// else if (selected=="other"&&other_check!=true){
-							// }
-							// else{
-							// 	let each = document.createElement("div");
-							// 	let each_event_title=document.createElement("span");
-							// 	each_event_title.innerHTML=content+" ";
-							// 	let each_event_time=document.createElement("span");
-							// 	each_event_time.innerHTML=document.getElementById("time").value;
-							// 	each.appendChild(each_event_title);
-							// 	each.appendChild(each_event_time);
-							// 	each.classList="one_event";
-							// 	each.classList+=" "+selected;
-							// 	date.appendChild(each);
-								
-							// }
-							const data = {'content': content, 'datetime': dt, 'username': group_member, 'tag': selected, 'token': token};
-							//console.log(data);
-							fetch('addGroupEvent.php', {
-								method: "POST",
-								body: JSON.stringify(data),
-								headers: { 'content-type': 'application/json' 
-								}
-							})
-							.then(response => response.json())
-							.then(data => {
-								if(data.success==false){
-									if(data.message_member){
-										alert (data.message_member);
-									}
-									alert(data.message);
-								}
-								else{
-									alert (data.message_member);
-									alert(data.message);
-									updateCalendar();
-								}
-								
-							})
-							//.then(function(stuff){console.log(stuff);})
-							.catch(error => console.error(error));
-							// .then(response => response.json())
-							// .then(function(stuff){
-							// 	console.log(stuff);
-							// 	alert(stuff);
-							// }).catch(error => console.error(error));
+			if(document.getElementById("group_member1").value==""){
+			}
+			else{
+			$("#group_popup").hide(400);
+			const id = document.getElementById("dateId").value;
+			const idRegex = /\d{4}-\d{2}-\d{2}\w/g;
+			let sqlDate = id.match(idRegex);
+			let time = document.getElementById("time").value;
+			let dt = String(sqlDate+time+":00.000Z");
+			event2.preventDefault();
+			//add to group_events
+			for(let i=1; i<=group_count; i++){
+				console.log(group_count);
+				console.log(i);
+				let member_id="group_member"+String(i);
+				if(document.getElementById(member_id).value!=""){
+					let content = document.getElementById("event_content").value;
+					let selected=document.getElementById("tag_value").value;
+					let group_member = document.getElementById(member_id).value;
+					const data = {'content': content, 'datetime': dt, 'username': group_member, 'tag': selected, 'token': token};
+					//console.log(data);
+					fetch('addGroupEvent.php', {
+						method: "POST",
+						body: JSON.stringify(data),
+						headers: { 'content-type': 'application/json' 
 						}
-						else{/*do nothing if there's no username input*/}
-					}
-					// let remove = document.getElementsByClassName("group_input");
-					// console.log(remove.length);
-					let parent = document.getElementById("group_form");
-					// for(let r=0;r<remove.length;r++){
-					// 	parent.removeChild(remove[r]);
-					// }
-					parent.innerHTML="";
-					let enter=document.createElement("div");
-					enter.innerHTML="Enter usernames of your group members here:"
-					let input_group_member=document.createElement("input");
-					input_group_member.setAttribute("type","text");
-					input_group_member.setAttribute("id","group_member1");
-					let add_another_user_button=document.createElement("button");
-					add_another_user_button.setAttribute("id","add_another_user");
-					add_another_user_button.innerHTML="+";
-					parent.appendChild(enter);
-					parent.appendChild(input_group_member);
-					parent.appendChild(add_another_user_button);
-					document.getElementById("add_another_user").addEventListener("click", function(event){
-						event.preventDefault();
-						let div=document.createElement("div");
-						let this_member = document.createElement("input");
-						this_member.setAttribute("type", "text");
-						div.setAttribute("class", "group_input");
-						group_count += 1;
-						let this_member_id = "group_member"+String(group_count);
-						this_member.setAttribute("id", this_member_id);
-						div.appendChild(this_member);
-						//this_member.textContent = 
-						document.getElementById("group_form").appendChild(div);
 					})
-					document.getElementById("event_content").value = "";
-				}, false)
+					.then(response => response.json())
+					.then(data => {
+						if(data.success==false){
+							if(data.message_member){
+								alert (data.message_member);
+							}
+							alert(data.message);
+						}
+						else{
+							alert (data.message_member);
+							alert(data.message);
+							updateCalendar();
+						}
+						
+					})
+					.catch(error => console.error(error));
+					
+				}
+				else{/*do nothing if there's no username input*/}
+			}
+			let parent = document.getElementById("group_form");
+			parent.innerHTML="";
+			let enter=document.createElement("div");
+			enter.innerHTML="Enter usernames of your group members here:"
+			let input_group_member=document.createElement("input");
+			input_group_member.setAttribute("type","text");
+			input_group_member.setAttribute("id","group_member1");
+			let add_another_user_button=document.createElement("button");
+			add_another_user_button.setAttribute("id","add_another_user");
+			add_another_user_button.innerHTML="+";
+			parent.appendChild(enter);
+			parent.appendChild(input_group_member);
+			parent.appendChild(add_another_user_button);
+			document.getElementById("add_another_user").addEventListener("click", function(event){
+				event.preventDefault();
+				let div=document.createElement("div");
+				let this_member = document.createElement("input");
+				this_member.setAttribute("type", "text");
+				div.setAttribute("class", "group_input");
+				group_count += 1;
+				let this_member_id = "group_member"+String(group_count);
+				this_member.setAttribute("id", this_member_id);
+				div.appendChild(this_member);
+				//this_member.textContent = 
+				document.getElementById("group_form").appendChild(div);
+			})
+			document.getElementById("event_content").value = "";
+			}
+		}, false)
 
 
 		//change background color of select drop down based on what is selected

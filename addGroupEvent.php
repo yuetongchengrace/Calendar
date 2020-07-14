@@ -5,7 +5,7 @@
     $json_str = file_get_contents('php://input');
     //This will store the data into an associative array
     $json_obj = json_decode($json_str, true);
-    $content = $json_obj['content'];
+    $content = htmlentities($json_obj['content']);
     $dt = $json_obj['datetime'];
     $member = htmlentities($json_obj['username']);
     $host = $_SESSION['username'];

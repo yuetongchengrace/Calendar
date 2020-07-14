@@ -7,7 +7,7 @@
     $json_obj = json_decode($json_str, true);
     $username=$_SESSION['username'];
     $modify_id = $json_obj['modify_id'];
-    $changed_content = $json_obj['changed_content'];
+    $changed_content = htmlentities($json_obj['changed_content']);
     $token = $json_obj['token'];
 
     require 'database.php';

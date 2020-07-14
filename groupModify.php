@@ -6,8 +6,8 @@
     //This will store the data into an associative array
     $json_obj = json_decode($json_str, true);
     $username=$_SESSION['username'];
-    $old_content = $json_obj['modify_content'];
-    $changed_content = $json_obj['changed_content'];
+    $old_content = htmlentities($json_obj['modify_content']);
+    $changed_content = htmlentities($json_obj['changed_content']);
     $host=$_SESSION['username'];
     $time=$json_obj['time'];
     $token=$json_obj['token'];

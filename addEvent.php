@@ -5,7 +5,7 @@
     header("Content-Type: application/json"); 
     $json_str = file_get_contents('php://input');
     $json_obj = json_decode($json_str, true);
-    $content = $json_obj['content'];
+    $content = htmlentities($json_obj['content']);
     $dt = $json_obj['datetime'];
     $tag= $json_obj['tag'];
     $username=$_SESSION['username'];
