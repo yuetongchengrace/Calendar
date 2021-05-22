@@ -1,5 +1,5 @@
-**event types** selection - Users can add different types of events, and they will be displayed with various background color to distinguish different types of events. Users can also check what type of event they want to show on the calendar table.
-**group event** feature - users can create a group event and add other users to an event. After adding the event only the host(the creator of the group event) can delete or modify the event. Host cannot create a group event with a non-existent user.
+**event types** selection - Users can add different types of events, and they will be displayed with various background color to distinguish different types of events. Users can also check what type of event they want to show on the calendar table. <br/>
+**group event** feature - users can create a group event and add other users to an event. After adding the event only the host(the creator of the group event) can delete or modify the event. Host cannot create a group event with a non-existent user. <br/>
 
 ### Website Link: 
 http://ec2-3-21-230-111.us-east-2.compute.amazonaws.com/~yuetongchen/module5-group/login.html
