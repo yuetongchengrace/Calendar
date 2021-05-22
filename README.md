@@ -1,3 +1,7 @@
+### Group Members:
+Grace Chen <br/>
+Chenye Qi
+
 ### Features: 
 **event types** selection - Users can add different types of events, and they will be displayed with various background color to distinguish different types of events. Users can also check what type of event they want to show on the calendar table. <br/>
 **group event** feature - users can create a group event and add other users to an event. After adding the event only the host(the creator of the group event) can delete or modify the event. Host cannot create a group event with a non-existent user. <br/>
